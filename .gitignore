@@ -1,2 +1,13 @@
-*.jar
+# compiled Java classes
 *.class
+
+# generic Java ignores
+/bin/
+/.settings/
+/.vscode/
+
+# library jars (kept locally only)
+lib/*.jar
+
+# other
+*.log
