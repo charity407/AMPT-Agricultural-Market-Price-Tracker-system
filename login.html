@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Log In — AgroMarket Price Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet" />
+  <style>
+    /* Centers the card on the screen */
+    .auth-layout {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+      padding: var(--sp-4);
+      background-color: var(--c-surface-alt);
+    }
+    .auth-card {
+      background: var(--c-white);
+      padding: var(--sp-8);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 26rem;
+      border-top: 4px solid var(--c-field);
+    }
+    .auth-card__header { text-align: center; margin-bottom: var(--sp-6); }
+    .auth-card__logo { font-size: var(--fs-3xl); color: var(--c-sprout); line-height: 1; }
+    .auth-card__title { font-family: var(--f-display); font-size: var(--fs-2xl); color: var(--c-field); margin-top: var(--sp-2); }
+    .form-group { margin-bottom: var(--sp-4); }
+    .auth-footer { text-align: center; margin-top: var(--sp-6); font-size: var(--fs-sm); }
+  </style>
+</head>
+<body>
+
+  <main class="auth-layout">
+    <div class="auth-card">
+      <div class="auth-card__header">
+        <div class="auth-card__logo">⬡</div>
+        <h1 class="auth-card__title">Welcome Back</h1>
+        <p style="color: var(--c-text-muted); font-size: var(--fs-sm);">Access your market dashboard</p>
+      </div>
+
+      <form id="loginForm" novalidate>
+        
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <input class="form-input" type="email" id="email" name="email" required placeholder="name@example.com">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input class="form-input" type="password" id="password" name="password" required placeholder="Enter your password">
+        </div>
+
+        <button class="btn btn--primary btn--full" type="submit" id="loginBtn">Log In</button>
+      </form>
+
+      <div class="auth-footer">
+        Don't have an account? <a href="register.html">Register here</a>.
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // ── CLIENT-SIDE VALIDATION LOGIC ──
+    const form = document.getElementById('loginForm');
+    
+    form.addEventListener('submit', (e) => {
+      e.preventDefault(); // Stop normal form submission
+
+      // Validate fields before hitting the backend
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return; 
+      }
+
+      // Simulate sending data to the Java Backend
+      const loginBtn = document.getElementById('loginBtn');
+      loginBtn.textContent = 'Authenticating...';
+      loginBtn.disabled = true;
+
+      const email = document.getElementById('email').value;
+
+      console.log('Sending credentials to /login Servlet for:', email);
+
+      // Simulate a 1-second delay, then redirect to the dashboard
+      setTimeout(() => {
+        window.location.href = 'index.html'; 
+      }, 1000);
+    });
+  </script>
+</body>
+</html>

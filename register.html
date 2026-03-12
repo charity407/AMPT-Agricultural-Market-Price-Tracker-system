@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register — AgroMarket Price Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet" />
+  <style>
+    /* Specific layout for auth pages to center the card */
+    .auth-layout {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+      padding: var(--sp-4);
+      background-color: var(--c-surface-alt);
+    }
+    .auth-card {
+      background: var(--c-white);
+      padding: var(--sp-8);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 28rem;
+      border-top: 4px solid var(--c-field);
+    }
+    .auth-card__header { text-align: center; margin-bottom: var(--sp-6); }
+    .auth-card__logo { font-size: var(--fs-3xl); color: var(--c-sprout); line-height: 1; }
+    .auth-card__title { font-family: var(--f-display); font-size: var(--fs-2xl); color: var(--c-field); margin-top: var(--sp-2); }
+    .form-group { margin-bottom: var(--sp-4); }
+    .auth-footer { text-align: center; margin-top: var(--sp-6); font-size: var(--fs-sm); }
+    .error-text { color: var(--c-danger); font-size: var(--fs-xs); margin-top: var(--sp-1); display: none; }
+  </style>
+</head>
+<body>
+
+  <main class="auth-layout">
+    <div class="auth-card">
+      <div class="auth-card__header">
+        <div class="auth-card__logo">⬡</div>
+        <h1 class="auth-card__title">Create Account</h1>
+        <p style="color: var(--c-text-muted); font-size: var(--fs-sm);">Join the AgroMarket network</p>
+      </div>
+
+      <form id="registerForm" novalidate>
+        
+        <div class="form-group">
+          <label class="form-label" for="fullName">Full Name</label>
+          <input class="form-input" type="text" id="fullName" name="fullName" required placeholder="e.g. Jane Doe">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <input class="form-input" type="email" id="email" name="email" required placeholder="jane@example.com">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="role">Account Type</label>
+          <select class="form-select" id="role" name="role" required>
+            <option value="" disabled selected>Select your role...</option>
+            <option value="FARMER">Farmer</option>
+            <option value="TRADER">Trader</option>
+            <option value="CONSUMER">Consumer</option>
+            <option value="MARKET_AGENT">Market Agent (Requires Admin Approval)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input class="form-input" type="password" id="password" name="password" required placeholder="Minimum 8 characters">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="confirmPassword">Confirm Password</label>
+          <input class="form-input" type="password" id="confirmPassword" required placeholder="Re-type password">
+          <div class="error-text" id="passwordError">Passwords do not match!</div>
+        </div>
+
+        <button class="btn btn--primary btn--full" type="submit" id="submitBtn">Register Account</button>
+      </form>
+
+      <div class="auth-footer">
+        Already have an account? <a href="login.html">Log in here</a>.
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // ── CLIENT-SIDE VALIDATION LOGIC ──
+    const form = document.getElementById('registerForm');
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirmPassword');
+    const passwordError = document.getElementById('passwordError');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault(); // Stop the form from submitting normally
+
+      // 1. Check if passwords match
+      if (password.value !== confirmPassword.value) {
+        passwordError.style.display = 'block';
+        confirmPassword.style.borderColor = 'var(--c-danger)';
+        return; // Stop execution
+      } else {
+        passwordError.style.display = 'none';
+        confirmPassword.style.borderColor = 'var(--c-border)';
+      }
+
+      // 2. Check if all required HTML5 fields are filled
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return; // Stop execution
+      }
+
+      // 3. If everything is correct, prepare data for the Java Backend
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.textContent = 'Registering...';
+      submitBtn.disabled = true;
+
+      const formData = {
+        fullName: document.getElementById('fullName').value,
+        email: document.getElementById('email').value,
+        role: document.getElementById('role').value,
+        password: password.value
+      };
+
+      console.log('Sending this data to /register Servlet:', formData);
+      
+      // MOCK API CALL: This simulates sending data to your Java backend
+      // In production, you will replace the setTimeout with an actual fetch('/register')
+      setTimeout(() => {
+        alert('Registration simulated successfully! Redirecting to login...');
+        window.location.href = 'login.html'; // Redirect to the login page you will build next
+      }, 1500);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Agricultural Market Price Tracker — Real-time crop and commodity prices" />
+  <title>AgroMarket — Price Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet" />
+  <style>
+    /* Quick inline CSS to make the sidebar collapse work */
+    .sidebar { transition: width 0.3s ease, padding 0.3s ease; overflow: hidden; }
+    .sidebar.is-collapsed { width: 0; padding-left: 0; padding-right: 0; border: none; opacity: 0; }
+  </style>
+</head>
+<body>
+
+  <header class="site-header" role="banner">
+    <nav class="navbar" aria-label="Primary navigation">
+
+      <div class="navbar__brand">
+        <span class="navbar__logo" aria-hidden="true">⬡</span>
+        <span class="navbar__name">AgroMarket</span>
+        <span class="navbar__tagline">Price Intelligence</span>
+      </div>
+
+      <button class="navbar__hamburger" id="navToggle" aria-expanded="false" aria-controls="navMenu" aria-label="Toggle navigation menu">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+      </button>
+
+      <ul class="navbar__menu" id="navMenu" role="list">
+        <li><a href="#dashboard" class="navbar__link is-active" aria-current="page">Dashboard</a></li>
+        <li><a href="#prices" class="navbar__link">Prices</a></li>
+        <li><a href="#admin" class="navbar__link">Admin</a></li>
+      </ul>
+
+      <div class="navbar__user" id="navbarUser" aria-live="polite">
+        <span class="badge badge--admin" id="userRoleBadge" data-role="">ADMIN</span>
+        <span class="navbar__username" id="navbarUsername">Loading…</span>
+      </div>
+
+    </nav>
+  </header>
+
+  <main class="layout" id="mainContent">
+
+    <button class="btn btn--secondary" id="sidebarToggleBtn" type="button" aria-label="Toggle Filters" 
+            style="position: absolute; left: var(--sp-4); z-index: 10; padding: 0.25rem 0.5rem; font-size: 1.2rem; margin-top: -0.5rem;">
+      «
+    </button>
+
+    <aside class="sidebar" id="mainSidebar" aria-label="Filters and quick stats">
+      <section class="sidebar__block">
+        <h2 class="sidebar__heading">Market Filters</h2>
+        <label class="form-label" for="regionSelect">Region</label>
+        <select class="form-select" id="regionSelect" name="region">
+          <option value="">All Regions</option>
+        </select>
+
+        <label class="form-label" for="commoditySelect">Commodity</label>
+        <select class="form-select" id="commoditySelect" name="commodity">
+          <option value="">All Commodities</option>
+        </select>
+
+        <button class="btn btn--primary btn--full" id="applyFilters" type="button" style="margin-top: 1rem;">Apply Filters</button>
+      </section>
+
+      <section class="sidebar__block">
+        <h2 class="sidebar__heading">Quick Stats</h2>
+        <ul class="stat-list" id="quickStats" aria-live="polite">
+          <li class="stat-list__item">
+            <span class="stat-list__label">Markets Active</span>
+            <span class="stat-list__value" data-stat="activeMarkets">—</span>
+          </li>
+          <li class="stat-list__item">
+            <span class="stat-list__label">Commodities</span>
+            <span class="stat-list__value" data-stat="totalCommodities">—</span>
+          </li>
+        </ul>
+      </section>
+    </aside>
+
+    <div class="content-area">
+
+      <section class="content-section" id="dashboard">
+        <div class="section-header">
+          <div>
+            <h1 class="section-header__title" id="dashboardHeading">Market Dashboard</h1>
+            <p class="section-header__sub" id="dashboardDateLine">Loading latest data…</p>
+          </div>
+        </div>
+
+        <div id="adminQuickLinks" class="alert-strip" style="display: flex; gap: var(--sp-3); align-items: center; background: var(--c-surface-alt); border-color: var(--c-border); margin-bottom: var(--sp-6);">
+          <strong style="color: var(--c-field);">Admin Quick Links:</strong>
+          <a href="products.html" class="btn btn--sm btn--secondary">Manage Products</a>
+          <a href="markets.html" class="btn btn--sm btn--secondary">Manage Markets</a>
+        </div>
+
+      </section>
+
+      <section class="content-section" id="prices">
+        <div class="section-header">
+          <div>
+            <h2 class="section-header__title">Live Price Board</h2>
+            <p class="section-header__sub">All prices shown in KES per kg unless stated</p>
+          </div>
+          <div class="table-toolbar">
+            <button class="btn btn--secondary" id="refreshDashboard" type="button">↻ Refresh Data</button>
+          </div>
+        </div>
+
+        <div class="table-state" id="priceTableLoading">
+          <div class="skeleton-row"></div><div class="skeleton-row"></div><div class="skeleton-row"></div>
+        </div>
+
+        <div class="table-wrap" id="priceTableWrap" hidden>
+          <table class="data-table" id="priceTable">
+            <thead>
+              <tr>
+                <th scope="col">Commodity</th>
+                <th scope="col">Market</th>
+                <th scope="col">Region</th>
+                <th scope="col" class="align-right">Price (KES)</th>
+                <th scope="col" class="align-right">7d Change</th>
+                <th scope="col">Updated</th>
+                <th scope="col">Source</th>
+              </tr>
+            </thead>
+            <tbody id="priceTableBody">
+              </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="content-section" id="admin">
+        <div class="section-header">
+          <div>
+            <h2 class="section-header__title">User Administration</h2>
+            <p class="section-header__sub">Manage user accounts and roles</p>
+          </div>
+          <button class="btn btn--primary" id="addUserBtn" type="button">+ Add User</button>
+        </div>
+
+        <div class="table-wrap" id="userTableWrap">
+          <table class="data-table" id="userTable">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Role</th>
+                <th scope="col">Region</th>
+                <th scope="col">Status</th>
+                <th scope="col">Joined</th>
+                <th scope="col" class="align-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody">
+              </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div></main>
+
+  <div class="modal-backdrop" id="modalBackdrop" hidden>
+    <div class="modal">
+      <div class="modal__header">
+        <h3 class="modal__title" id="modalTitle">Modal</h3>
+        <button class="modal__close" id="modalClose">✕</button>
+      </div>
+      <div class="modal__body" id="modalBody"></div>
+      <div class="modal__footer" id="modalFooter">
+        <button class="btn btn--ghost" id="modalCancel">Cancel</button>
+        <button class="btn btn--primary" id="modalConfirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <footer class="site-footer">
+    <p>© <span id="footerYear"></span> AgroMarket Price Intelligence</p>
+    <p class="site-footer__status">API Status: <span class="status-dot status-dot--ok">●</span></p>
+  </footer>
+
+  <script src="main.js" defer></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const sidebar = document.getElementById('mainSidebar');
+      const toggleBtn = document.getElementById('sidebarToggleBtn');
+
+      if(toggleBtn && sidebar) {
+        toggleBtn.addEventListener('click', () => {
+          const isCollapsed = sidebar.classList.toggle('is-collapsed');
+          
+          // Change the icon based on the state
+          toggleBtn.textContent = isCollapsed ? '»' : '«';
+          
+          // Move the button slightly when collapsed so it stays visible
+          toggleBtn.style.left = isCollapsed ? '0' : 'var(--sp-4)';
+        });
+      }
+    });
+  </script>
+</body>
+</html>
