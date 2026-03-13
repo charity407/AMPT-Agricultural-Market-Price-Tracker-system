@@ -11,3 +11,6 @@ lib/*.jar
 
 # other
 *.log
+
+
+src/com/agriprice/utils/db.properties
