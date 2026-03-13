@@ -1,9 +1,14 @@
-const CACHE_NAME = 'agromarket-v1';
-const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/main.js'
+const CACHE_NAME = 'agromarket-cache-v2'; // Bump the version number to force an update
+
+// These paths assume Tomcat serves your app from the /AgroMarket context root
+const urlsToCache = [
+  './jsp/dashboard.jsp',
+  './jsp/navbar.jsp',
+  './jsp/error.jsp',
+  './css/style.css',
+  './js/main.js',
+  './login.html',
+  './register.html'
 ];
 
 // Install event: Cache the core files

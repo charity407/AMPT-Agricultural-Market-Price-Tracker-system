@@ -17,10 +17,9 @@
         <span class="navbar__tagline">Admin Portal</span>
       </div>
       <ul class="navbar__menu is-open" style="flex-direction: row; background: transparent; order: 0;">
-        <li><a href="index.html" class="navbar__link">Dashboard</a></li>
-        <li><a href="products.html" class="navbar__link is-active">Products</a></li>
-        <li><a href="markets.html" class="navbar__link">Markets</a></li>
-      </ul>
+        <li><a href="../dashboard.jsp" class="navbar__link">Dashboard</a></li>
+        <li><a href="products.jsp" class="navbar__link">Products</a></li>
+        <li><a href="markets.jsp" class="navbar__link is-active">Markets</a></li>
     </nav>
   </header>
 
@@ -66,6 +65,6 @@
     </div>
   </div>
 
-  <script src="admin-products.js"></script>
+  <script src="../../js/admin-products.js"></script>
 </body>
 </html>

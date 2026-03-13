@@ -17,32 +17,55 @@
 </head>
 <body>
 
-  <header class="site-header" role="banner">
-    <nav class="navbar" aria-label="Primary navigation">
+  <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AgroMarket — Price Tracker</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
 
-      <div class="navbar__brand">
-        <span class="navbar__logo" aria-hidden="true">⬡</span>
-        <span class="navbar__name">AgroMarket</span>
-        <span class="navbar__tagline">Price Intelligence</span>
-      </div>
+  <jsp:include page="navbar.jsp" />
 
-      <button class="navbar__hamburger" id="navToggle" aria-expanded="false" aria-controls="navMenu" aria-label="Toggle navigation menu">
-        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
-      </button>
+  <main class="layout" id="mainContent">
+    ```
+*You must do this exact same replacement for `admin/users.jsp`, `admin/products.jsp`, and `admin/markets.jsp`.*
 
-      <ul class="navbar__menu" id="navMenu" role="list">
-        <li><a href="#dashboard" class="navbar__link is-active" aria-current="page">Dashboard</a></li>
-        <li><a href="#prices" class="navbar__link">Prices</a></li>
-        <li><a href="#admin" class="navbar__link">Admin</a></li>
-      </ul>
+### Step 3: Create `error.jsp`
+Your M5 task list explicitly makes you responsible for `error.jsp`. If the Java backend crashes, or someone tries to visit a page that doesn't exist, the server needs a clean, branded page to show them instead of a raw stack trace.
 
-      <div class="navbar__user" id="navbarUser" aria-live="polite">
-        <span class="badge badge--admin" id="userRoleBadge" data-role="">ADMIN</span>
-        <span class="navbar__username" id="navbarUsername">Loading…</span>
-      </div>
+Create `error.jsp` in the `jsp/` folder and paste this code:
 
-    </nav>
-  </header>
+```jsp
+<%@ page language="java" contentType="text/html; charset=UTF-8" isErrorPage="true" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>System Error — AgroMarket</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .error-layout { display: flex; align-items: center; justify-content: center; min-height: 100dvh; background: var(--c-surface-alt); text-align: center; padding: var(--sp-4); }
+    .error-card { background: var(--c-white); padding: var(--sp-8); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border-top: 4px solid var(--c-danger); max-width: 30rem; }
+  </style>
+</head>
+<body class="error-layout">
+  <div class="error-card">
+    <h1 style="color: var(--c-danger); margin-bottom: var(--sp-2);">⚠️ System Error</h1>
+    <p style="margin-bottom: var(--sp-4); color: var(--c-text-muted);">We encountered an unexpected problem while processing your request.</p>
+    
+    <div style="background: var(--c-mist); padding: var(--sp-3); border-radius: var(--radius-sm); margin-bottom: var(--sp-6); font-family: var(--f-mono); font-size: var(--fs-sm); text-align: left; overflow-x: auto;">
+      <strong>Error Details:</strong> <br>
+      <%= exception != null ? exception.getMessage() : "Unknown Server Error. Please contact an Administrator." %>
+    </div>
+    
+    <a href="dashboard.jsp" class="btn btn--primary">Return to Dashboard</a>
+  </div>
+</body>
+</html>
 
   <main class="layout" id="mainContent">
 
@@ -134,33 +157,7 @@
         </div>
       </section>
 
-      <section class="content-section" id="admin">
-        <div class="section-header">
-          <div>
-            <h2 class="section-header__title">User Administration</h2>
-            <p class="section-header__sub">Manage user accounts and roles</p>
-          </div>
-          <button class="btn btn--primary" id="addUserBtn" type="button">+ Add User</button>
-        </div>
-
-        <div class="table-wrap" id="userTableWrap">
-          <table class="data-table" id="userTable">
-            <thead>
-              <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Email</th>
-                <th scope="col">Role</th>
-                <th scope="col">Region</th>
-                <th scope="col">Status</th>
-                <th scope="col">Joined</th>
-                <th scope="col" class="align-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="userTableBody">
-              </tbody>
-          </table>
-        </div>
-      </section>
+    
 
     </div></main>
 

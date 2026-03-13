@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Manage Markets — AgroMarket Admin</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet" />
 </head>
 <body>
@@ -17,9 +17,9 @@
         <span class="navbar__tagline">Admin Portal</span>
       </div>
       <ul class="navbar__menu is-open" style="flex-direction: row; background: transparent; order: 0;">
-        <li><a href="index.html" class="navbar__link">Dashboard</a></li>
-        <li><a href="products.html" class="navbar__link">Products</a></li>
-        <li><a href="markets.html" class="navbar__link is-active">Markets</a></li>
+        <li><a href="../dashboard.jsp" class="navbar__link">Dashboard</a></li>
+        <li><a href="products.jsp" class="navbar__link">Products</a></li>
+        <li><a href="markets.jsp" class="navbar__link is-active">Markets</a></li>
       </ul>
     </nav>
   </header>
@@ -67,6 +67,6 @@
     </div>
   </div>
 
-  <script src="admin-markets.js"></script>
+  <script src="../../js/admin-markets.js"></script>
 </body>
 </html>

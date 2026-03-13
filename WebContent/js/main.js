@@ -5,13 +5,19 @@
 
 // ── 1. SERVICE WORKER REGISTRATION (PWA Requirement) ─────────
 function initPWA() {
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .then(reg => console.log('Service Worker registered successfully.', reg.scope))
-        .catch(err => console.error('Service Worker registration failed. Offline mode disabled.', err));
-    });
-  }
+  // Register Service Worker for Offline Capabilities
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    // Notice the path: it looks for sw.js at the root of the app, not inside the js/ folder
+    navigator.serviceWorker.register('../sw.js')
+      .then(registration => {
+        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      })
+      .catch(error => {
+        console.log('ServiceWorker registration failed: ', error);
+      });
+  });
+}
 }
 
 // ── 2. API UTILITY (Network handling) ────────────────────────
@@ -290,51 +296,4 @@ async function loadDashboard() {
   }
   
   showToast('Dashboard updated', 'success');
-}
-// ── 10. ADMIN USER MANAGEMENT ────────────────────────────────
-async function loadAdminUsers() {
-  const tableBody = document.getElementById('userTableBody');
-  if (!tableBody) return;
-
-  // Fetch the mock data we just added
-  const users = await apiFetch('/api/users');
-  if (!users) return;
-
-  tableBody.innerHTML = ''; // Clear existing rows
-
-  users.forEach(user => {
-    // Dynamically format the badge classes based on your CSS
-    const roleClass = `badge--${user.role.toLowerCase().replace('_', '-')}`;
-    const statusClass = `badge--${user.status.toLowerCase()}`;
-    
-    // Determine the correct toggle button based on current status
-    const toggleBtn = user.status === 'ACTIVE' 
-      ? `<button class="btn btn--sm btn--danger" onclick="toggleUserStatus(${user.id}, 'deactivate')">Deactivate</button>`
-      : `<button class="btn btn--sm btn--primary" onclick="toggleUserStatus(${user.id}, 'activate')">Activate</button>`;
-
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td><strong>${user.name}</strong></td>
-      <td>${user.email}</td>
-      <td><span class="badge ${roleClass}">${user.role}</span></td>
-      <td>${user.region}</td>
-      <td><span class="badge ${statusClass}">${user.status}</span></td>
-      <td>${user.joined}</td>
-      <td class="align-right" style="white-space: nowrap;">
-        <button class="btn btn--sm btn--secondary" onclick="editUser(${user.id})">Edit</button>
-        ${toggleBtn}
-      </td>
-    `;
-    tableBody.appendChild(row);
-  });
-}
-
-// Dummy functions to show the buttons work
-function editUser(id) {
-  showToast(`Opening edit modal for user ID: ${id}`, 'info');
-}
-
-function toggleUserStatus(id, action) {
-  showToast(`Simulating backend call to ${action} user ID: ${id}`, 'warning');
-  // In reality, this would be an apiFetch POST request to your Java backend
 }
