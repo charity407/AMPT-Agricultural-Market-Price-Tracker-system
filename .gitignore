@@ -11,3 +11,22 @@ lib/*.jar
 
 # other
 *.log
+
+# PASSWORDS — never commit db.properties
+src/com/agriprice/utils/db.properties
+
+# Java compiled files
+*.class
+*.jar
+target/
+*.war
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+*.DS_Store
+
+# Logs
+*.log
+logs/
