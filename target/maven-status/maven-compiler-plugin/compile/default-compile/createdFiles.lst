@@ -1,3 +1,5 @@
 com/agriprice/models/PriceEntry.class
 com/agriprice/models/PriceAlert.class
 com/agriprice/utils/DBConnection.class
+com/agriprice/servlets/PriceListServlet.class
+com/agriprice/servlets/PriceEntryServlet.class
