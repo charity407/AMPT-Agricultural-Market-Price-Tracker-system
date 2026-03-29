@@ -1,22 +1,23 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
-    <title>Price Trends</title>
+    <title>Price Comparison</title>
 </head>
 <body>
-<h1>Price Trend (last ${days} days)</h1>
+<h1>Price Comparison</h1>
 <c:if test="${not empty error}">
     <p style="color:red">${error}</p>
 </c:if>
 <table border="1">
     <thead>
-    <tr><th>Date</th><th>Price</th></tr>
+    <tr><th>Market</th><th>Latest Price</th><th>Date</th></tr>
     </thead>
     <tbody>
-    <c:forEach var="row" items="${trendData}">
+    <c:forEach var="item" items="${comparisonData}">
         <tr>
-            <td>${row[0]}</td>
-            <td>${row[1]}</td>
+            <td>${item[0]}</td>
+            <td>${item[1]}</td>
+            <td>${item[2]}</td>
         </tr>
     </c:forEach>
     </tbody>

@@ -1,5 +1,15 @@
-/home/mukanga/Agri-Price-Tracker/AMPT-Agricultural-Market-Price-Tracker-system/src/com/agriprice/models/PriceAlert.java
-/home/mukanga/Agri-Price-Tracker/AMPT-Agricultural-Market-Price-Tracker-system/src/com/agriprice/servlets/PriceListServlet.java
+/home/mukanga/Agri-Price-Tracker/AMPT-Agricultural-Market-Price-Tracker-system/src/com/agriprice/servlets/AlertServlet.java
+/home/mukanga/Agri-Price-Tracker/AMPT-Agricultural-Market-Price-Tracker-system/src/com/agriprice/servlets/PriceTrendServlet.java
 /home/mukanga/Agri-Price-Tracker/AMPT-Agricultural-Market-Price-Tracker-system/src/com/agriprice/models/PriceEntry.java
+/home/mukanga/Agri-Price-Tracker/AMPT-Agricultural-Market-Price-Tracker-system/src/com/agriprice/servlets/ReportServlet.java
 /home/mukanga/Agri-Price-Tracker/AMPT-Agricultural-Market-Price-Tracker-system/src/com/agriprice/utils/DBConnection.java
+/home/mukanga/Agri-Price-Tracker/AMPT-Agricultural-Market-Price-Tracker-system/src/com/agriprice/servlets/LogoutServlet.java
+/home/mukanga/Agri-Price-Tracker/AMPT-Agricultural-Market-Price-Tracker-system/src/com/agriprice/servlets/UserManagementServlet.java
+/home/mukanga/Agri-Price-Tracker/AMPT-Agricultural-Market-Price-Tracker-system/src/com/agriprice/servlets/PriceEditServlet.java
+/home/mukanga/Agri-Price-Tracker/AMPT-Agricultural-Market-Price-Tracker-system/src/com/agriprice/servlets/AlertCheckServlet.java
+/home/mukanga/Agri-Price-Tracker/AMPT-Agricultural-Market-Price-Tracker-system/src/com/agriprice/models/PriceAlert.java
+/home/mukanga/Agri-Price-Tracker/AMPT-Agricultural-Market-Price-Tracker-system/src/com/agriprice/servlets/RegisterServlet.java
+/home/mukanga/Agri-Price-Tracker/AMPT-Agricultural-Market-Price-Tracker-system/src/com/agriprice/servlets/PriceListServlet.java
 /home/mukanga/Agri-Price-Tracker/AMPT-Agricultural-Market-Price-Tracker-system/src/com/agriprice/servlets/PriceEntryServlet.java
+/home/mukanga/Agri-Price-Tracker/AMPT-Agricultural-Market-Price-Tracker-system/src/com/agriprice/servlets/LoginServlet.java
+/home/mukanga/Agri-Price-Tracker/AMPT-Agricultural-Market-Price-Tracker-system/src/com/agriprice/servlets/PriceCompareServlet.java

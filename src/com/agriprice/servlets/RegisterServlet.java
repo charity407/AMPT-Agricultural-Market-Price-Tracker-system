@@ -1,87 +1,83 @@
 package com.agriprice.servlets;
 
-import com.agriprice.models.User;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 import com.agriprice.utils.DBConnection;
-import com.agriprice.utils.PasswordUtil;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-
 @WebServlet("/register")
 public class RegisterServlet extends HttpServlet {
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        req.getRequestDispatcher("/register.html").forward(req, resp);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        // Get form fields from register.html
-        String fullName = request.getParameter("fullName");
-        String email    = request.getParameter("email");
-        String role     = request.getParameter("role");
-        String password = request.getParameter("password");
+        String fullName = req.getParameter("fullName");
+        String email = req.getParameter("email");
+        String password = req.getParameter("password");
+        String role = req.getParameter("role"); // e.g., FARMER, AGENT
 
-        // Basic validation
-        if (fullName == null || email == null || role == null || password == null ||
-                fullName.isEmpty() || email.isEmpty() || role.isEmpty() || password.isEmpty()) {
-            request.setAttribute("error", "All fields are required.");
-            request.getRequestDispatcher("/register.html").forward(request, response);
+        if (fullName == null || email == null || password == null || role == null ||
+                fullName.isEmpty() || email.isEmpty() || password.isEmpty() || role.isEmpty()) {
+            resp.sendRedirect(req.getContextPath() + "/register?error=All fields required");
             return;
         }
 
-        if (password.length() < 8) {
-            request.setAttribute("error", "Password must be at least 8 characters.");
-            request.getRequestDispatcher("/register.html").forward(request, response);
+        // Validate email format
+        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+            resp.sendRedirect(req.getContextPath() + "/register?error=Invalid email format");
             return;
         }
 
-        try (Connection conn = DBConnection.getConnection()) {
+        // Validate password strength (at least 6 characters)
+        if (password.length() < 6) {
+            resp.sendRedirect(req.getContextPath() + "/register?error=Password must be at least 6 characters");
+            return;
+        }
 
-            // Check if email already exists
-            PreparedStatement check = conn.prepareStatement(
-                    "SELECT user_id FROM users WHERE email_address = ?"
-            );
-            check.setString(1, email);
-            ResultSet rs = check.executeQuery();
+        // Validate role
+        if (!role.equals("FARMER") && !role.equals("AGENT") && !role.equals("ADMIN")) {
+            resp.sendRedirect(req.getContextPath() + "/register?error=Invalid role");
+            return;
+        }
 
-            if (rs.next()) {
-                request.setAttribute("error", "Email is already registered.");
-                request.getRequestDispatcher("/register.html").forward(request, response);
-                return;
+        String sql = "INSERT INTO users (full_name, email_address, password_hash, role) VALUES (?, ?, ?, ?)";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, fullName);
+            ps.setString(2, email);
+            ps.setString(3, password); // In production, hash the password
+            ps.setString(4, role);
+
+            ps.executeUpdate();
+            resp.sendRedirect(req.getContextPath() + "/login?success=Registration successful");
+
+        } catch (SQLException e) {
+            if (e.getSQLState().equals("23505")) { // Unique violation
+                resp.sendRedirect(req.getContextPath() + "/register?error=Email already exists");
+            } else {
+                e.printStackTrace();
+                resp.sendRedirect(req.getContextPath() + "/register?error=Registration failed");
             }
-
-            // Hash the password
-            String hashedPassword = PasswordUtil.hashPassword(password);
-
-            // MARKET_AGENT accounts need admin approval
-            String status = role.equals("MARKET_AGENT") ? "PENDING" : "ACTIVE";
-
-            // Insert new user into database
-            PreparedStatement insert = conn.prepareStatement(
-                    "INSERT INTO users (full_name, email_address, password_hash, role, account_status, is_verified) " +
-                            "VALUES (?, ?, ?, ?, ?, ?)"
-            );
-            insert.setString(1, fullName);
-            insert.setString(2, email);
-            insert.setString(3, hashedPassword);
-            insert.setString(4, role);
-            insert.setString(5, status);
-            insert.setBoolean(6, false);
-            insert.executeUpdate();
-
-            // Redirect to login page after successful registration
-            response.sendRedirect(request.getContextPath() + "/login.html");
-
         } catch (Exception e) {
-            System.err.println("[RegisterServlet] Error: " + e.getMessage());
-            request.setAttribute("error", "Something went wrong. Please try again.");
-            request.getRequestDispatcher("/register.html").forward(request, response);
+            e.printStackTrace();
+            resp.sendRedirect(req.getContextPath() + "/register?error=Registration failed");
         }
     }
 }

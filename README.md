@@ -19,6 +19,11 @@
   - [Tech Stack](#tech-stack)
   - [Team Members \& Roles](#team-members--roles)
   - [File Structure](#file-structure)
+  - [Design Files](#design-files)
+    - [Design File Locations](#design-file-locations)
+    - [Design File Access](#design-file-access)
+    - [Design Ownership \& Modification Rules](#design-ownership--modification-rules)
+    - [Wireframe \& Mockup Checklist](#wireframe--mockup-checklist)
   - [Where Each Member Stores Their Code](#where-each-member-stores-their-code)
     - [M1 — Database Admin](#m1--database-admin)
     - [M2 — Auth \& Users](#m2--auth--users)
@@ -179,6 +184,61 @@ docs/                                        [M7]
 ├── user_manual.md                           [M7] How to use the system (end-user guide)
 └── final_report.md                          [M7] Group project report
 ```
+
+---
+
+## Design Files
+
+UI/UX design files, wireframes, mockups, and prototypes for AgriPrice KE. All design assets are centrally managed to ensure consistency across the application.
+
+### Design File Locations
+
+| Design Asset                | Location/Link                                        | Owner | Format         |
+| --------------------------- | ---------------------------------------------------- | ----- | -------------- |
+| **Desktop Wireframes**       | `design/wireframes/desktop/`                         | M5    | Figma / PDF    |
+| **Mobile Wireframes**        | `design/wireframes/mobile/`                          | M5    | Figma / PDF    |
+| **UI Component Library**     | `design/components/`                                 | M5    | Figma          |
+| **Style Guide & Brand Kit**  | `design/brand-kit/agriprice-style-guide.pdf`         | M5    | PDF / Figma    |
+| **Dashboard Mockup**         | `design/mockups/dashboard-admin.fig`                 | M5    | Figma          |
+| **Login/Register Screens**   | `design/mockups/auth-screens.fig`                    | M5    | Figma          |
+| **Price Entry Form**         | `design/mockups/price-entry.fig`                     | M6    | Figma          |
+| **Price List & Filters**     | `design/mockups/price-list.fig`                      | M6    | Figma          |
+| **Market Comparison View**   | `design/mockups/compare-markets.fig`                 | M6    | Figma          |
+| **Trend Chart / Analytics**  | `design/mockups/trends-chart.fig`                    | M6    | Figma          |
+| **Price Alerts Page**        | `design/mockups/alerts-management.fig`               | M6    | Figma          |
+| **User Profile Page**        | `design/mockups/user-profile.fig`                    | M6    | Figma          |
+| **Admin Management Pages**   | `design/mockups/admin-users-products-markets.fig`    | M5/M6 | Figma          |
+| **Responsive Breakpoints**   | `design/responsive/breakpoints.md`                   | M5    | Markdown       |
+| **Accessibility Guidelines** | `design/guidelines/accessibility.md`                 | M5    | Markdown       |
+
+### Design File Access
+
+- **Figma Design System**: [https://figma.com/...agriprice-ke](https://figma.com) _(shared with M5, M6, M7)_
+- **PDF Exports**: Stored in `design/` folder, committed to Git for reference
+- **Prototype Link**: [https://www.figma.com/proto/...](https://www.figma.com/proto/) _(interactive prototype for testing)_
+
+### Design Ownership & Modification Rules
+
+| Area                    | Owner | Can Modify                          | Rules                                                          |
+| ----------------------- | ----- | ----------------------------------- | -------------------------------------------------------------- |
+| **Color Palette**        | M5    | M5 only (discuss changes with M6/M7) | Consistent across all pages; update `style.css` immediately   |
+| **Typography/Fonts**     | M5    | M5 only                             | Define once in `style.css`; all pages must inherit              |
+| **Component Styles**     | M5    | M5 only                             | Buttons, forms, tables, modals — maintain library consistency  |
+| **Page Layouts**         | M5/M6 | M5 (core UI), M6 (feature pages)   | Ask M5 before creating new layout patterns                     |
+| **Responsive Design**     | M5    | M5 only                             | Ensure mobile-first; test at 320px, 768px, 1024px, 1440px     |
+| **Ad-hoc Mockups**       | M6    | M6 (for feature pages)              | Keep in sync with M5's design system; request review before PR |
+
+### Wireframe & Mockup Checklist
+
+Before implementing any JSP/HTML page, ensure:
+
+- ✅ Wireframe approved by project stakeholder
+- ✅ Mockup created in Figma (linked in this table)
+- ✅ Component styles defined in `style.css`
+- ✅ Responsive breakpoints tested
+- ✅ Accessibility standards met (WCAG 2.1 AA minimum)
+- ✅ Design review completed by M5 (Core UI)
+- ✅ Code review includes design compliance check
 
 ---
 
