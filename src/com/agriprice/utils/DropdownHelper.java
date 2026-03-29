@@ -1,6 +1,6 @@
-package com.ampt.util;
+package com.agriprice.util;
 
-import com.ampt.db.DatabaseConfig;
+import com.agriprice.db.DatabaseConfig;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
