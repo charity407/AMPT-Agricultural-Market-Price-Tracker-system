@@ -1,6 +1,16 @@
 package com.agriprice.servlets;
 
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.agriprice.utils.DBConnection;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -8,130 +18,110 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-import java.io.IOException;
-import java.sql.*;
-import java.util.*;
-
 @WebServlet("/admin/users")
 public class UserManagementServlet extends HttpServlet {
 
-    // GET /admin/users — load all users and display in admin JSP
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        if (!isAdmin(request, response)) return;
+        HttpSession session = req.getSession();
+        String userRole = (String) session.getAttribute("userRole");
 
-        try (Connection conn = DBConnection.getConnection()) {
+        if (!"ADMIN".equals(userRole)) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
+            return;
+        }
 
-            PreparedStatement ps = conn.prepareStatement(
-                    "SELECT user_id, full_name, email_address, role, " +
-                            "account_status, is_verified, registration_date " +
-                            "FROM users ORDER BY registration_date DESC"
-            );
-
-            ResultSet rs = ps.executeQuery();
+        String action = req.getParameter("action");
+        if ("edit".equals(action)) {
+            int userId = Integer.parseInt(req.getParameter("id"));
+            // Load user for editing
+            String sql = "SELECT * FROM users WHERE user_id = ?";
+            try (Connection conn = DBConnection.getConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, userId);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    req.setAttribute("userId", rs.getInt("user_id"));
+                    req.setAttribute("fullName", rs.getString("full_name"));
+                    req.setAttribute("email", rs.getString("email_address"));
+                    req.setAttribute("role", rs.getString("role"));
+                    req.setAttribute("status", rs.getString("account_status"));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            req.getRequestDispatcher("/jsp/admin/users/edit.jsp").forward(req, resp);
+        } else {
+            // List users
             List<Map<String, Object>> users = new ArrayList<>();
-
-            while (rs.next()) {
-                Map<String, Object> user = new LinkedHashMap<>();
-                user.put("userId",           rs.getInt("user_id"));
-                user.put("fullName",         rs.getString("full_name"));
-                user.put("emailAddress",     rs.getString("email_address"));
-                user.put("role",             rs.getString("role"));
-                user.put("accountStatus",    rs.getString("account_status"));
-                user.put("isVerified",       rs.getBoolean("is_verified"));
-                user.put("registrationDate", rs.getString("registration_date"));
-                users.add(user);
+            String sql = "SELECT user_id, full_name, email_address, role, account_status FROM users ORDER BY user_id";
+            try (Connection conn = DBConnection.getConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);
+                    ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> user = new HashMap<>();
+                    user.put("userId", rs.getInt("user_id"));
+                    user.put("fullName", rs.getString("full_name"));
+                    user.put("email", rs.getString("email_address"));
+                    user.put("role", rs.getString("role"));
+                    user.put("status", rs.getString("account_status"));
+                    users.add(user);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            request.setAttribute("users", users);
-            request.getRequestDispatcher("/jsp/admin/users.jsp").forward(request, response);
-
-        } catch (Exception e) {
-            System.err.println("[UserManagementServlet] Error: " + e.getMessage());
-            request.setAttribute("error", "Failed to load users.");
-            request.getRequestDispatcher("/jsp/admin/users.jsp").forward(request, response);
+            req.setAttribute("users", users);
+            req.getRequestDispatcher("/jsp/admin/users/list.jsp").forward(req, resp);
         }
     }
 
-    // POST /admin/users — activate / deactivate / change role
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        if (!isAdmin(request, response)) return;
+        HttpSession session = req.getSession();
+        String userRole = (String) session.getAttribute("userRole");
 
-        String action      = request.getParameter("action");
-        String userIdParam = request.getParameter("userId");
-
-        if (action == null || userIdParam == null) {
-            response.sendRedirect(request.getContextPath() + "/admin/users");
+        if (!"ADMIN".equals(userRole)) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
             return;
         }
 
-        int targetId;
-        try {
-            targetId = Integer.parseInt(userIdParam);
-        } catch (NumberFormatException e) {
-            response.sendRedirect(request.getContextPath() + "/admin/users");
-            return;
-        }
+        String action = req.getParameter("action");
 
-        try (Connection conn = DBConnection.getConnection()) {
+        if ("update".equals(action)) {
+            int userId = Integer.parseInt(req.getParameter("userId"));
+            String fullName = req.getParameter("fullName");
+            String email = req.getParameter("email");
+            String role = req.getParameter("role");
+            String status = req.getParameter("status");
 
-            switch (action) {
-
-                case "activate":
-                    runUpdate(conn,
-                            "UPDATE users SET account_status = 'ACTIVE' WHERE user_id = ?",
-                            targetId);
-                    break;
-
-                case "deactivate":
-                    runUpdate(conn,
-                            "UPDATE users SET account_status = 'INACTIVE' WHERE user_id = ?",
-                            targetId);
-                    break;
-
-                case "changeRole":
-                    String newRole = request.getParameter("role");
-                    if (newRole != null && !newRole.isEmpty()) {
-                        PreparedStatement ps = conn.prepareStatement(
-                                "UPDATE users SET role = ? WHERE user_id = ?"
-                        );
-                        ps.setString(1, newRole);
-                        ps.setInt(2, targetId);
-                        ps.executeUpdate();
-                    }
-                    break;
+            String sql = "UPDATE users SET full_name = ?, email_address = ?, role = ?, account_status = ? WHERE user_id = ?";
+            try (Connection conn = DBConnection.getConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, fullName);
+                ps.setString(2, email);
+                ps.setString(3, role);
+                ps.setString(4, status);
+                ps.setInt(5, userId);
+                ps.executeUpdate();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            response.sendRedirect(request.getContextPath() + "/admin/users");
-
-        } catch (Exception e) {
-            System.err.println("[UserManagementServlet] Error: " + e.getMessage());
-            response.sendRedirect(request.getContextPath() + "/admin/users");
+        } else if ("delete".equals(action)) {
+            int userId = Integer.parseInt(req.getParameter("userId"));
+            String sql = "DELETE FROM users WHERE user_id = ?";
+            try (Connection conn = DBConnection.getConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, userId);
+                ps.executeUpdate();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-    }
 
-    private void runUpdate(Connection conn, String sql, int id) throws SQLException {
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setInt(1, id);
-        ps.executeUpdate();
-    }
-
-    private boolean isAdmin(HttpServletRequest req, HttpServletResponse res)
-            throws IOException {
-        HttpSession session = req.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) {
-            res.sendRedirect(req.getContextPath() + "/login.html");
-            return false;
-        }
-        if (!"ADMIN".equals(session.getAttribute("userRole"))) {
-            res.sendRedirect(req.getContextPath() + "/jsp/dashboard.jsp");
-            return false;
-        }
-        return true;
+        resp.sendRedirect(req.getContextPath() + "/admin/users");
     }
 }

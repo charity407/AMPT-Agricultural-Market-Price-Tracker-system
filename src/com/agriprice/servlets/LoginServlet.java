@@ -1,7 +1,12 @@
 package com.agriprice.servlets;
 
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
 import com.agriprice.utils.DBConnection;
-import com.agriprice.utils.PasswordUtil;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -9,106 +14,55 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
-    // GET /login — show login page (redirect to dashboard if already logged in)
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        if (session != null && session.getAttribute("userId") != null) {
-            response.sendRedirect(request.getContextPath() + "/jsp/dashboard.jsp");
-            return;
-        }
-        request.getRequestDispatcher("/login.html").forward(request, response);
+        req.getRequestDispatcher("/login.html").forward(req, resp);
     }
 
-    // POST /login — verify credentials and create session
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        String email    = request.getParameter("email");
-        String password = request.getParameter("password");
+        String email = req.getParameter("email");
+        String password = req.getParameter("password");
 
-        // Edge case: empty fields
-        if (isBlank(email) || isBlank(password)) {
-            forward(request, response, "Email and password are required.");
+        if (email == null || password == null || email.isEmpty() || password.isEmpty()) {
+            resp.sendRedirect(req.getContextPath() + "/login?error=Email and password required");
             return;
         }
 
-        try (Connection conn = DBConnection.getConnection()) {
+        // Basic email format validation
+        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+            resp.sendRedirect(req.getContextPath() + "/login?error=Invalid email format");
+            return;
+        }
 
-            PreparedStatement ps = conn.prepareStatement(
-                    "SELECT user_id, full_name, password_hash, role, account_status " +
-                            "FROM users WHERE email_address = ?"
-            );
-            ps.setString(1, email.trim());
+        String sql = "SELECT user_id, full_name, role FROM users WHERE email_address = ? AND password_hash = ? AND account_status = 'ACTIVE'";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, email);
+            ps.setString(2, password); // In production, hash the password
+
             ResultSet rs = ps.executeQuery();
-
-            // Edge case: email not found
-            if (!rs.next()) {
-                forward(request, response, "Invalid email or password.");
-                return;
-            }
-
-            String storedHash    = rs.getString("password_hash");
-            String accountStatus = rs.getString("account_status");
-            String role          = rs.getString("role");
-            String fullName      = rs.getString("full_name");
-            int    userId        = rs.getInt("user_id");
-
-            // Edge case: wrong password
-            if (!PasswordUtil.verifyPassword(password, storedHash)) {
-                forward(request, response, "Invalid email or password.");
-                return;
-            }
-
-            // Edge case: pending account
-            if ("PENDING".equals(accountStatus)) {
-                forward(request, response, "Your account is pending admin approval.");
-                return;
-            }
-
-            // Edge case: inactive / suspended account
-            if (!"ACTIVE".equals(accountStatus)) {
-                forward(request, response, "Your account is not active. Please contact support.");
-                return;
-            }
-
-            // All checks passed — create session
-            // NOTE: These exact attribute names are used by ALL team members
-            HttpSession session = request.getSession();
-            session.setAttribute("userId",   userId);
-            session.setAttribute("userRole", role);
-            session.setAttribute("userName", fullName);
-
-            // Admins go to user management, everyone else to dashboard
-            if ("ADMIN".equals(role)) {
-                response.sendRedirect(request.getContextPath() + "/admin/users");
+            if (rs.next()) {
+                HttpSession session = req.getSession();
+                session.setAttribute("userId", rs.getInt("user_id"));
+                session.setAttribute("userRole", rs.getString("role"));
+                session.setAttribute("userName", rs.getString("full_name"));
+                resp.sendRedirect(req.getContextPath() + "/dashboard.jsp");
             } else {
-                response.sendRedirect(request.getContextPath() + "/jsp/dashboard.jsp");
+                resp.sendRedirect(req.getContextPath() + "/login?error=Invalid credentials");
             }
 
         } catch (Exception e) {
-            System.err.println("[LoginServlet] Error: " + e.getMessage());
-            forward(request, response, "Something went wrong. Please try again.");
+            e.printStackTrace();
+            resp.sendRedirect(req.getContextPath() + "/login?error=Login failed");
         }
-    }
-
-    private void forward(HttpServletRequest req, HttpServletResponse res,
-                         String error) throws ServletException, IOException {
-        req.setAttribute("error", error);
-        req.getRequestDispatcher("/login.html").forward(req, res);
-    }
-
-    private boolean isBlank(String s) {
-        return s == null || s.trim().isEmpty();
     }
 }

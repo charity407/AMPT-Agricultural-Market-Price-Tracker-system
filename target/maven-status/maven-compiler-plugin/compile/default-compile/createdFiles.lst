@@ -1,5 +1,15 @@
+com/agriprice/servlets/LoginServlet.class
 com/agriprice/models/PriceEntry.class
 com/agriprice/models/PriceAlert.class
 com/agriprice/utils/DBConnection.class
-com/agriprice/servlets/PriceListServlet.class
 com/agriprice/servlets/PriceEntryServlet.class
+com/agriprice/servlets/AlertCheckServlet.class
+com/agriprice/servlets/PriceCompareServlet.class
+com/agriprice/servlets/PriceTrendServlet.class
+com/agriprice/servlets/LogoutServlet.class
+com/agriprice/servlets/ReportServlet.class
+com/agriprice/servlets/AlertServlet.class
+com/agriprice/servlets/PriceListServlet.class
+com/agriprice/servlets/RegisterServlet.class
+com/agriprice/servlets/PriceEditServlet.class
+com/agriprice/servlets/UserManagementServlet.class

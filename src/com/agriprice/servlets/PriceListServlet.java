@@ -15,6 +15,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/prices/list")
 public class PriceListServlet extends HttpServlet {
@@ -23,26 +24,39 @@ public class PriceListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+        HttpSession session = req.getSession();
+        if (session.getAttribute("userId") == null) {
+            resp.sendRedirect(req.getContextPath() + "/login?error=Please login first");
+            return;
+        }
+
         String cropName = req.getParameter("cropName");
         String region = req.getParameter("region");
         String market = req.getParameter("market");
         String fromDate = req.getParameter("fromDate");
         String toDate = req.getParameter("toDate");
 
-        StringBuilder sql = new StringBuilder("SELECT * FROM price_entries WHERE 1=1");
+        StringBuilder sql = new StringBuilder("""
+                SELECT pe.entry_id, p.product_name, pe.unit_price, m.market_name, r.region_name, pe.price_date
+                FROM price_entries pe
+                JOIN products p ON pe.product_id = p.product_id
+                JOIN markets m ON pe.market_id = m.market_id
+                JOIN regions r ON m.region_id = r.region_id
+                WHERE 1=1
+                """);
 
         if (cropName != null && !cropName.isEmpty())
-            sql.append(" AND crop_name = ?");
+            sql.append(" AND p.product_name ILIKE ?");
         if (region != null && !region.isEmpty())
-            sql.append(" AND region = ?");
+            sql.append(" AND r.region_name ILIKE ?");
         if (market != null && !market.isEmpty())
-            sql.append(" AND market = ?");
+            sql.append(" AND m.market_name ILIKE ?");
         if (fromDate != null && !fromDate.isEmpty())
-            sql.append(" AND date_recorded >= ?");
+            sql.append(" AND pe.price_date >= ?");
         if (toDate != null && !toDate.isEmpty())
-            sql.append(" AND date_recorded <= ?");
+            sql.append(" AND pe.price_date <= ?");
 
-        sql.append(" ORDER BY date_recorded DESC");
+        sql.append(" ORDER BY pe.price_date DESC");
 
         List<String[]> priceList = new ArrayList<>();
 
@@ -51,11 +65,11 @@ public class PriceListServlet extends HttpServlet {
 
             int i = 1;
             if (cropName != null && !cropName.isEmpty())
-                ps.setString(i++, cropName);
+                ps.setString(i++, "%" + cropName + "%");
             if (region != null && !region.isEmpty())
-                ps.setString(i++, region);
+                ps.setString(i++, "%" + region + "%");
             if (market != null && !market.isEmpty())
-                ps.setString(i++, market);
+                ps.setString(i++, "%" + market + "%");
             if (fromDate != null && !fromDate.isEmpty())
                 ps.setDate(i++, Date.valueOf(fromDate));
             if (toDate != null && !toDate.isEmpty())
@@ -64,11 +78,11 @@ public class PriceListServlet extends HttpServlet {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 priceList.add(new String[] {
-                        rs.getString("crop_name"),
-                        rs.getString("price"),
-                        rs.getString("market"),
-                        rs.getString("region"),
-                        rs.getString("date_recorded")
+                        rs.getString("product_name"),
+                        rs.getString("unit_price"),
+                        rs.getString("market_name"),
+                        rs.getString("region_name"),
+                        rs.getString("price_date")
                 });
             }
 

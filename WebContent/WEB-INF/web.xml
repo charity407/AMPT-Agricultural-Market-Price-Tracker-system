@@ -101,6 +101,15 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>PriceEditServlet</servlet-name>
+        <servlet-class>com.agriprice.servlets.PriceEditServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PriceEditServlet</servlet-name>
+        <url-pattern>/prices/edit</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>PriceCompareServlet</servlet-name>
         <servlet-class>com.agriprice.servlets.PriceCompareServlet</servlet-class>
     </servlet>
@@ -125,6 +134,15 @@
     <servlet-mapping>
         <servlet-name>AlertServlet</servlet-name>
         <url-pattern>/alerts</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>AlertCheckServlet</servlet-name>
+        <servlet-class>com.agriprice.servlets.AlertCheckServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AlertCheckServlet</servlet-name>
+        <url-pattern>/alerts/check</url-pattern>
     </servlet-mapping>
 
     <servlet>
