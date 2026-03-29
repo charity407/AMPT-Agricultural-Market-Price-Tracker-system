@@ -40,6 +40,8 @@ public class MarketServlet implements HttpHandler {
 
     private void handleGet(HttpExchange ex, Integer id, String query) throws Exception {
         Connection conn = DatabaseConfig.getConnection();
+
+        // Single market by ID
         if (id != null) {
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM markets WHERE market_id=?");
             ps.setInt(1, id);
@@ -48,16 +50,24 @@ public class MarketServlet implements HttpHandler {
             else           send(ex, 404, "{\"error\":\"Market not found\"}");
             return;
         }
+
+        // Parse query params
+        // Supports: ?regionId=1  ?region=1  ?status=INACTIVE
         String regionFilter = null;
-        String statusFilter = "ACTIVE"; // default — only show active markets
+        String statusFilter = "ACTIVE"; // default — only active markets
+
         if (query != null) {
             for (String param : query.split("&")) {
-                if (param.startsWith("region=")) regionFilter = param.substring(7);
-                if (param.startsWith("status=")) statusFilter = param.substring(7).toUpperCase();
+                if (param.startsWith("regionId=")) regionFilter = param.substring(9);
+                if (param.startsWith("region="))   regionFilter = param.substring(7);
+                if (param.startsWith("status="))   statusFilter = param.substring(7).toUpperCase();
             }
         }
+
         StringBuilder sql = new StringBuilder("SELECT * FROM markets WHERE status=?");
-        if (regionFilter != null) sql.append(" AND region_id=").append(Integer.parseInt(regionFilter));
+        if (regionFilter != null) {
+            sql.append(" AND region_id=").append(Integer.parseInt(regionFilter));
+        }
         sql.append(" ORDER BY market_name");
 
         PreparedStatement ps = conn.prepareStatement(sql.toString());
@@ -73,16 +83,20 @@ public class MarketServlet implements HttpHandler {
         if (!m.isValid()) { send(ex, 400, "{\"error\":\"Invalid market data\"}"); return; }
         Connection conn = DatabaseConfig.getConnection();
 
-        // verify region exists
+        // Verify region exists
         PreparedStatement regChk = conn.prepareStatement("SELECT 1 FROM regions WHERE region_id=?");
         regChk.setInt(1, m.getRegionId());
-        if (!regChk.executeQuery().next()) { send(ex, 400, "{\"error\":\"Region does not exist\"}"); return; }
+        if (!regChk.executeQuery().next()) {
+            send(ex, 400, "{\"error\":\"Region does not exist\"}"); return;
+        }
 
-        // unique name per region
+        // Unique name per region
         PreparedStatement dupChk = conn.prepareStatement(
             "SELECT 1 FROM markets WHERE LOWER(market_name)=LOWER(?) AND region_id=?");
         dupChk.setString(1, m.getMarketName()); dupChk.setInt(2, m.getRegionId());
-        if (dupChk.executeQuery().next()) { send(ex, 409, "{\"error\":\"Market name already exists in this region\"}"); return; }
+        if (dupChk.executeQuery().next()) {
+            send(ex, 409, "{\"error\":\"Market name already exists in this region\"}"); return;
+        }
 
         PreparedStatement ps = conn.prepareStatement(
             "INSERT INTO markets(market_name,physical_address,town,country,latitude,longitude,operating_days,operating_hours,status,date_registered,region_id) VALUES(?,?,?,?,?,?,?,?,?,NOW(),?)",
@@ -111,8 +125,12 @@ public class MarketServlet implements HttpHandler {
 
         PreparedStatement dupChk = conn.prepareStatement(
             "SELECT 1 FROM markets WHERE LOWER(market_name)=LOWER(?) AND region_id=? AND market_id<>?");
-        dupChk.setString(1, m.getMarketName()); dupChk.setInt(2, m.getRegionId()); dupChk.setInt(3, id);
-        if (dupChk.executeQuery().next()) { send(ex, 409, "{\"error\":\"Market name already exists in this region\"}"); return; }
+        dupChk.setString(1, m.getMarketName());
+        dupChk.setInt(2, m.getRegionId());
+        dupChk.setInt(3, id);
+        if (dupChk.executeQuery().next()) {
+            send(ex, 409, "{\"error\":\"Market name already exists in this region\"}"); return;
+        }
 
         PreparedStatement ps = conn.prepareStatement(
             "UPDATE markets SET market_name=?,physical_address=?,town=?,operating_days=?,operating_hours=?,status=?,region_id=? WHERE market_id=?");
@@ -132,8 +150,9 @@ public class MarketServlet implements HttpHandler {
     private void handleDelete(HttpExchange ex, Integer id) throws Exception {
         if (id == null) { send(ex, 400, "{\"error\":\"ID required\"}"); return; }
         Connection conn = DatabaseConfig.getConnection();
-        // soft delete — preserve price history
-        PreparedStatement ps = conn.prepareStatement("UPDATE markets SET status='INACTIVE' WHERE market_id=?");
+        // Soft delete — preserve price history
+        PreparedStatement ps = conn.prepareStatement(
+            "UPDATE markets SET status='INACTIVE' WHERE market_id=?");
         ps.setInt(1, id);
         int rows = ps.executeUpdate();
         if (rows == 0) send(ex, 404, "{\"error\":\"Market not found\"}");
