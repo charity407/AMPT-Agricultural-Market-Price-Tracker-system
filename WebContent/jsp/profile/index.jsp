@@ -2,115 +2,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AgriMarket Tracker</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f4f0; color: #333;
-        }
-        nav {
-            background: #2e7d32; padding: 0 24px;
-            display: flex; align-items: center; justify-content: space-between;
-            height: 56px; box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-        }
-        nav .brand { color: #fff; font-size: 1.2rem; font-weight: 700; text-decoration: none; }
-        nav ul { list-style: none; display: flex; gap: 4px; }
-        nav ul li a {
-            color: #c8e6c9; text-decoration: none; padding: 8px 14px;
-            border-radius: 4px; font-size: 0.9rem; transition: background 0.2s;
-        }
-        nav ul li a:hover { background: #1b5e20; color: #fff; }
-
-        .hero {
-            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
-            color: #fff; text-align: center; padding: 60px 24px;
-        }
-        .hero h1 { font-size: 2.4rem; margin-bottom: 10px; }
-        .hero p  { font-size: 1.05rem; opacity: 0.85; max-width: 520px; margin: 0 auto; }
-
-        .page-wrapper { max-width: 1000px; margin: 40px auto; padding: 0 16px; }
-
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .nav-card {
-            background: #fff; border-radius: 10px; padding: 28px 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.09); text-align: center;
-            text-decoration: none; color: #333; transition: transform 0.2s, box-shadow 0.2s;
-            border-top: 4px solid #66bb6a;
-            display: flex; flex-direction: column; align-items: center; gap: 12px;
-        }
-        .nav-card:hover { transform: translateY(-4px); box-shadow: 0 6px 16px rgba(0,0,0,0.14); }
-        .nav-card .icon { font-size: 2.4rem; }
-        .nav-card h3 { font-size: 1rem; color: #2e7d32; }
-        .nav-card p  { font-size: 0.82rem; color: #888; line-height: 1.4; }
-
-        .section-title {
-            font-size: 1.1rem; font-weight: 700; color: #2e7d32;
-            margin: 36px 0 16px; border-left: 4px solid #66bb6a; padding-left: 10px;
-        }
-    </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Profile — AgroMarket</title>
+  <link rel="stylesheet" href="../../css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    .profile-wrap { max-width:680px; margin:40px auto; padding:0 16px; }
+    .profile-card {
+      background:#fff; border-radius:10px; padding:32px;
+      box-shadow:0 2px 10px rgba(0,0,0,0.08); margin-bottom:24px;
+      border-top:3px solid #2e7d32;
+    }
+    .profile-card h2 {
+      font-size:1rem; font-weight:700; color:#2e7d32;
+      margin-bottom:20px; border-bottom:1px solid #e8f5e9; padding-bottom:10px;
+    }
+    .info-row { display:flex; gap:12px; margin-bottom:10px; font-size:0.9rem; }
+    .info-row .lbl { color:#888; width:140px; flex-shrink:0; }
+    .info-row .val { color:#333; font-weight:500; }
+    .form-row { margin-bottom:16px; }
+    .form-row label { display:block; font-size:0.85rem; font-weight:600; color:#555; margin-bottom:5px; }
+    .form-row input {
+      width:100%; padding:9px 12px; border:1px solid #ddd;
+      border-radius:6px; font-size:0.95rem; box-sizing:border-box;
+    }
+    .form-row input:focus { outline:none; border-color:#2e7d32; }
+    .btn-save {
+      background:#2e7d32; color:#fff; border:none; padding:10px 24px;
+      border-radius:6px; cursor:pointer; font-size:0.9rem; font-weight:600;
+    }
+    .btn-save:hover { background:#1b5e20; }
+    .alert { padding:10px 14px; border-radius:6px; font-size:0.875rem; margin-bottom:16px; }
+    .alert-success { background:#f0fdf4; border:1px solid #86efac; color:#166534; }
+    .alert-error   { background:#fef2f2; border:1px solid #fca5a5; color:#b91c1c; }
+    .badge { display:inline-block; padding:2px 10px; border-radius:99px; font-size:0.75rem; font-weight:600; }
+    .badge-active   { background:#dcfce7; color:#166534; }
+    .badge-pending  { background:#fef9c3; color:#854d0e; }
+    .badge-inactive { background:#fee2e2; color:#991b1b; }
+  </style>
 </head>
 <body>
-<nav>
-    <a href="index.jsp" class="brand">🌾 AgriMarket Tracker</a>
-    <ul>
-        <li><a href="prices/list.jsp">Price List</a></li>
-        <li><a href="prices/compare.jsp">Compare</a></li>
-        <li><a href="prices/entry.jsp">Add Price</a></li>
-        <li><a href="prices/history.jsp">History</a></li>
-        <li><a href="trends/trends.jsp">Trends</a></li>
-      
-        <li><a href="admin/admin.jsp" style="font-weight:bold; color:#ffeb3b;">Admin</a></li>
-    </ul>
-</nav>
 
-<div class="hero">
-    <h1>🌾 AgriMarket Price Tracker</h1>
-    <p>Track, compare and analyse agricultural product prices across Kenya's markets in real time.</p>
-</div>
+<jsp:include page="../navbar.jsp"/>
 
-<div class="page-wrapper">
-    <p class="section-title">Quick Navigation</p>
-    <div class="cards-grid">
-        <a href="prices/list.jsp" class="nav-card">
-            <div class="icon">📋</div>
-            <h3>Price List</h3>
-            <p>Browse all current market prices with powerful filters.</p>
-        </a>
-        <a href="prices/compare.jsp" class="nav-card">
-            <div class="icon">⚖️</div>
-            <h3>Compare Prices</h3>
-            <p>Compare product prices across three markets side by side.</p>
-        </a>
-        <a href="prices/entry.jsp" class="nav-card">
-            <div class="icon">➕</div>
-            <h3>Enter Price</h3>
-            <p>Record a new agricultural product price for any market.</p>
-        </a>
-        <a href="prices/history.jsp" class="nav-card">
-            <div class="icon">🗂️</div>
-            <h3>Price History</h3>
-            <p>View historical records with pagination and sorting.</p>
-        </a>
-        <a href="trends/trends.jsp" class="nav-card">
-            <div class="icon">📈</div>
-            <h3>Trends</h3>
-            <p>Visualise price trends and statistics with a line chart.</p>
-        </a>
-        
-        <a href="admin/admin.jsp" class="nav-card">
-            <div class="icon">🛠️</div>
-            <h3>Admin</h3>
-            <p>Access the administration panel to manage products, users and prices.</p>
-        </a>
+<div class="profile-wrap">
+
+  <%-- Success / error from ProfileServlet --%>
+  <% if (request.getAttribute("success") != null) { %>
+    <div class="alert alert-success"><%= request.getAttribute("success") %></div>
+  <% } %>
+  <% if (request.getAttribute("error") != null) { %>
+    <div class="alert alert-error"><%= request.getAttribute("error") %></div>
+  <% } %>
+
+  <%-- Account Info (read-only) --%>
+  <div class="profile-card">
+    <h2>Account Information</h2>
+    <div class="info-row">
+      <span class="lbl">Full Name</span>
+      <span class="val"><%= request.getAttribute("fullName") != null ? request.getAttribute("fullName") : "" %></span>
     </div>
+    <div class="info-row">
+      <span class="lbl">Email</span>
+      <span class="val"><%= request.getAttribute("emailAddress") != null ? request.getAttribute("emailAddress") : "" %></span>
+    </div>
+    <div class="info-row">
+      <span class="lbl">Phone</span>
+      <span class="val"><%= request.getAttribute("phoneNumber") != null ? request.getAttribute("phoneNumber") : "—" %></span>
+    </div>
+    <div class="info-row">
+      <span class="lbl">Role</span>
+      <span class="val"><%= request.getAttribute("role") != null ? request.getAttribute("role") : "" %></span>
+    </div>
+    <div class="info-row">
+      <span class="lbl">Status</span>
+      <span class="val">
+        <%
+          String status = (String) request.getAttribute("accountStatus");
+          String cls = "ACTIVE".equals(status) ? "badge-active" :
+                       "PENDING".equals(status) ? "badge-pending" : "badge-inactive";
+        %>
+        <span class="badge <%= cls %>"><%= status != null ? status : "" %></span>
+      </span>
+    </div>
+    <div class="info-row">
+      <span class="lbl">Registered</span>
+      <span class="val"><%= request.getAttribute("registrationDate") != null ? request.getAttribute("registrationDate") : "" %></span>
+    </div>
+  </div>
+
+  <%-- Update Name & Phone --%>
+  <div class="profile-card">
+    <h2>Update Profile</h2>
+    <form method="POST" action="${pageContext.request.contextPath}/profile">
+      <input type="hidden" name="action" value="updateProfile"/>
+      <div class="form-row">
+        <label for="fullName">Full Name</label>
+        <input type="text" id="fullName" name="fullName"
+               value="<%= request.getAttribute("fullName") != null ? request.getAttribute("fullName") : "" %>"
+               required/>
+      </div>
+      <div class="form-row">
+        <label for="phoneNumber">Phone Number</label>
+        <input type="text" id="phoneNumber" name="phoneNumber"
+               value="<%= request.getAttribute("phoneNumber") != null ? request.getAttribute("phoneNumber") : "" %>"
+               placeholder="e.g. 0712345678"/>
+      </div>
+      <button class="btn-save" type="submit">Save Changes</button>
+    </form>
+  </div>
+
+  <%-- Change Password --%>
+  <div class="profile-card">
+    <h2>Change Password</h2>
+    <form method="POST" action="${pageContext.request.contextPath}/profile">
+      <input type="hidden" name="action" value="changePassword"/>
+      <div class="form-row">
+        <label for="oldPassword">Current Password</label>
+        <input type="password" id="oldPassword" name="oldPassword" required placeholder="Enter current password"/>
+      </div>
+      <div class="form-row">
+        <label for="newPassword">New Password</label>
+        <input type="password" id="newPassword" name="newPassword" required placeholder="Minimum 8 characters"/>
+      </div>
+      <div class="form-row">
+        <label for="confirmPassword">Confirm New Password</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Re-type new password"/>
+      </div>
+      <button class="btn-save" type="submit">Change Password</button>
+    </form>
+  </div>
+
+  <%-- Logout --%>
+  <div style="text-align:center; margin-bottom:40px;">
+    <a href="${pageContext.request.contextPath}/logout"
+       style="color:#b91c1c; font-size:0.9rem; text-decoration:none; font-weight:500;">
+      🚪 Log Out
+    </a>
+  </div>
+
 </div>
 </body>
 </html>
