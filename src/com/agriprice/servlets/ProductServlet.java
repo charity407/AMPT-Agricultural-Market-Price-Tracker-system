@@ -21,7 +21,7 @@ public class ProductServlet implements HttpHandler {
         if ("OPTIONS".equals(exchange.getRequestMethod())) { exchange.sendResponseHeaders(204, -1); return; }
         String method = exchange.getRequestMethod();
         String path   = exchange.getRequestURI().getPath();
-        String query  = exchange.getRequestURI().getQuery(); // e.g. category=2&all=true
+        String query  = exchange.getRequestURI().getQuery();
         String[] parts = path.split("/");
         Integer id = parts.length >= 4 ? parseId(parts[3]) : null;
 
@@ -40,6 +40,8 @@ public class ProductServlet implements HttpHandler {
 
     private void handleGet(HttpExchange ex, Integer id, String query) throws Exception {
         Connection conn = DatabaseConfig.getConnection();
+
+        // Single product by ID
         if (id != null) {
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM products WHERE product_id=?");
             ps.setInt(1, id);
@@ -48,22 +50,28 @@ public class ProductServlet implements HttpHandler {
             else           send(ex, 404, "{\"error\":\"Product not found\"}");
             return;
         }
-        // list — support ?category=X and ?all=true
+
+        // Parse query params
+        // Supports: ?categoryId=2  ?category=2  ?all=true
         String categoryFilter = null;
         boolean showAll = false;
+
         if (query != null) {
             for (String param : query.split("&")) {
-                if (param.startsWith("category=")) categoryFilter = param.substring(9);
-                if (param.equals("all=true")) showAll = true;
+                if (param.startsWith("categoryId=")) categoryFilter = param.substring(11);
+                if (param.startsWith("category="))   categoryFilter = param.substring(9);
+                if (param.equals("all=true"))         showAll = true;
             }
         }
+
         StringBuilder sql = new StringBuilder("SELECT * FROM products WHERE 1=1");
         if (!showAll) sql.append(" AND is_active=true");
-        if (categoryFilter != null) sql.append(" AND category_id=").append(Integer.parseInt(categoryFilter));
+        if (categoryFilter != null) {
+            sql.append(" AND category_id=").append(Integer.parseInt(categoryFilter));
+        }
         sql.append(" ORDER BY product_name");
 
-        PreparedStatement ps = conn.prepareStatement(sql.toString());
-        ResultSet rs = ps.executeQuery();
+        ResultSet rs = conn.prepareStatement(sql.toString()).executeQuery();
         List<Product> list = new ArrayList<>();
         while (rs.next()) list.add(mapProduct(rs));
         send(ex, 200, gson.toJson(list));
@@ -74,16 +82,21 @@ public class ProductServlet implements HttpHandler {
         if (!p.isValid()) { send(ex, 400, "{\"error\":\"Invalid product data\"}"); return; }
         Connection conn = DatabaseConfig.getConnection();
 
-        // verify category exists
-        PreparedStatement catChk = conn.prepareStatement("SELECT 1 FROM product_categories WHERE category_id=?");
+        // Verify category exists
+        PreparedStatement catChk = conn.prepareStatement(
+            "SELECT 1 FROM product_categories WHERE category_id=?");
         catChk.setInt(1, p.getCategoryId());
-        if (!catChk.executeQuery().next()) { send(ex, 400, "{\"error\":\"Category does not exist\"}"); return; }
+        if (!catChk.executeQuery().next()) {
+            send(ex, 400, "{\"error\":\"Category does not exist\"}"); return;
+        }
 
-        // duplicate name within same category
+        // No duplicate name within same category
         PreparedStatement dupChk = conn.prepareStatement(
             "SELECT 1 FROM products WHERE LOWER(product_name)=LOWER(?) AND category_id=?");
         dupChk.setString(1, p.getProductName()); dupChk.setInt(2, p.getCategoryId());
-        if (dupChk.executeQuery().next()) { send(ex, 409, "{\"error\":\"Product already exists in this category\"}"); return; }
+        if (dupChk.executeQuery().next()) {
+            send(ex, 409, "{\"error\":\"Product already exists in this category\"}"); return;
+        }
 
         PreparedStatement ps = conn.prepareStatement(
             "INSERT INTO products(product_name,local_name,category_id,standard_unit,is_active,date_added) VALUES(?,?,?,?,true,NOW())",
@@ -106,8 +119,12 @@ public class ProductServlet implements HttpHandler {
 
         PreparedStatement dupChk = conn.prepareStatement(
             "SELECT 1 FROM products WHERE LOWER(product_name)=LOWER(?) AND category_id=? AND product_id<>?");
-        dupChk.setString(1, p.getProductName()); dupChk.setInt(2, p.getCategoryId()); dupChk.setInt(3, id);
-        if (dupChk.executeQuery().next()) { send(ex, 409, "{\"error\":\"Product name already exists in this category\"}"); return; }
+        dupChk.setString(1, p.getProductName());
+        dupChk.setInt(2, p.getCategoryId());
+        dupChk.setInt(3, id);
+        if (dupChk.executeQuery().next()) {
+            send(ex, 409, "{\"error\":\"Product name already exists in this category\"}"); return;
+        }
 
         PreparedStatement ps = conn.prepareStatement(
             "UPDATE products SET product_name=?,local_name=?,category_id=?,standard_unit=? WHERE product_id=?");
@@ -124,8 +141,9 @@ public class ProductServlet implements HttpHandler {
     private void handleDelete(HttpExchange ex, Integer id) throws Exception {
         if (id == null) { send(ex, 400, "{\"error\":\"ID required\"}"); return; }
         Connection conn = DatabaseConfig.getConnection();
-        // soft delete — preserve price history (DR-004)
-        PreparedStatement ps = conn.prepareStatement("UPDATE products SET is_active=false WHERE product_id=?");
+        // Soft delete — preserve price history (DR-004)
+        PreparedStatement ps = conn.prepareStatement(
+            "UPDATE products SET is_active=false WHERE product_id=?");
         ps.setInt(1, id);
         int rows = ps.executeUpdate();
         if (rows == 0) send(ex, 404, "{\"error\":\"Product not found\"}");
