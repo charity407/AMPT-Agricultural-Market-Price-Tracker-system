@@ -36,6 +36,15 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>ProfileServlet</servlet-name>
+        <servlet-class>com.agriprice.servlets.ProfileServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ProfileServlet</servlet-name>
+        <url-pattern>/profile</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>UserManagementServlet</servlet-name>
         <servlet-class>com.agriprice.servlets.UserManagementServlet</servlet-class>
     </servlet>
