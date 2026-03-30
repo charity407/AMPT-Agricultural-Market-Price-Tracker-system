@@ -65,6 +65,36 @@ public class AlertServlet extends HttpServlet {
         }
 
         req.setAttribute("alerts", alerts);
+
+        // Fetch products and markets for the create-alert form dropdowns
+        List<Map<String, Object>> products = new ArrayList<>();
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(
+                     "SELECT product_id, product_name FROM products WHERE is_active = true ORDER BY product_name")) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> p = new HashMap<>();
+                p.put("productId", rs.getInt("product_id"));
+                p.put("productName", rs.getString("product_name"));
+                products.add(p);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+
+        List<Map<String, Object>> markets = new ArrayList<>();
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(
+                     "SELECT market_id, market_name FROM markets WHERE status = 'ACTIVE' ORDER BY market_name")) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> m = new HashMap<>();
+                m.put("marketId", rs.getInt("market_id"));
+                m.put("marketName", rs.getString("market_name"));
+                markets.add(m);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+
+        req.setAttribute("products", products);
+        req.setAttribute("markets", markets);
         req.getRequestDispatcher("/jsp/alerts/alerts.jsp").forward(req, resp);
     }
 
@@ -128,6 +158,19 @@ public class AlertServlet extends HttpServlet {
             } catch (Exception e) {
                 e.printStackTrace();
                 resp.sendRedirect(req.getContextPath() + "/alerts?error=Failed to update alert: " + e.getMessage());
+                return;
+            }
+        } else if ("delete".equals(action)) {
+            int alertId = Integer.parseInt(req.getParameter("alertId"));
+            String sql = "UPDATE price_alerts SET is_active = false WHERE alert_id = ? AND user_id = ?";
+            try (Connection conn = DBConnection.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, alertId);
+                ps.setInt(2, userId);
+                ps.executeUpdate();
+            } catch (Exception e) {
+                e.printStackTrace();
+                resp.sendRedirect(req.getContextPath() + "/alerts?error=Failed to delete alert");
                 return;
             }
         }
