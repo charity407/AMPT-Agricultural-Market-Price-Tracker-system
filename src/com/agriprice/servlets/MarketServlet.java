@@ -1,174 +1,129 @@
 package com.agriprice.servlets;
 
-import com.agriprice.models.Market;
-import com.agriprice.utils.DatabaseConfig;
-import com.google.gson.Gson;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-
-import java.io.*;
-import java.sql.*;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MarketServlet implements HttpHandler {
+import com.agriprice.utils.DBConnection;
 
-    private final Gson gson = new Gson();
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+@WebServlet("/admin/markets")
+public class MarketServlet extends HttpServlet {
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
-        addCors(exchange);
-        if ("OPTIONS".equals(exchange.getRequestMethod())) { exchange.sendResponseHeaders(204, -1); return; }
-        String method = exchange.getRequestMethod();
-        String path   = exchange.getRequestURI().getPath();
-        String query  = exchange.getRequestURI().getQuery();
-        String[] parts = path.split("/");
-        Integer id = parts.length >= 4 ? parseId(parts[3]) : null;
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
 
-        try {
-            switch (method) {
-                case "GET":    handleGet(exchange, id, query);  break;
-                case "POST":   handlePost(exchange);             break;
-                case "PUT":    handlePut(exchange, id);          break;
-                case "DELETE": handleDelete(exchange, id);       break;
-                default:       send(exchange, 405, "{\"error\":\"Method not allowed\"}");
-            }
-        } catch (Exception e) {
-            send(exchange, 500, "{\"error\":\"" + e.getMessage() + "\"}");
-        }
-    }
-
-    private void handleGet(HttpExchange ex, Integer id, String query) throws Exception {
-        Connection conn = DatabaseConfig.getConnection();
-        if (id != null) {
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM markets WHERE market_id=?");
-            ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) send(ex, 200, gson.toJson(mapMarket(rs)));
-            else           send(ex, 404, "{\"error\":\"Market not found\"}");
+        HttpSession session = req.getSession();
+        if (session.getAttribute("userId") == null) {
+            resp.sendRedirect(req.getContextPath() + "/login?error=Please login first");
             return;
         }
-        String regionFilter = null;
-        String statusFilter = "ACTIVE"; // default — only show active markets
-        if (query != null) {
-            for (String param : query.split("&")) {
-                if (param.startsWith("region=")) regionFilter = param.substring(7);
-                if (param.startsWith("status=")) statusFilter = param.substring(7).toUpperCase();
+
+        String userRole = (String) session.getAttribute("userRole");
+        if (!("ADMIN".equals(userRole))) {
+            resp.sendRedirect(req.getContextPath() + "/login?error=Admin access required");
+            return;
+        }
+
+        try {
+            List<Object[]> marketList = new ArrayList<>();
+            String sql = "SELECT m.market_id, m.market_name, m.town, r.region_name, m.operating_days, m.status " +
+                        "FROM markets m " +
+                        "LEFT JOIN regions r ON m.region_id = r.region_id " +
+                        "ORDER BY m.market_name";
+
+            try (Connection conn = DBConnection.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    marketList.add(new Object[]{
+                        rs.getInt("market_id"),
+                        rs.getString("market_name"),
+                        rs.getString("town"),
+                        rs.getString("region_name"),
+                        rs.getString("operating_days"),
+                        rs.getString("status")
+                    });
+                }
+            }
+
+            req.setAttribute("marketList", marketList);
+            req.getRequestDispatcher("/jsp/admin/markets.jsp").forward(req, resp);
+        } catch (Exception e) {
+            e.printStackTrace();
+            req.setAttribute("error", "Error loading markets: " + e.getMessage());
+            try {
+                req.getRequestDispatcher("/jsp/admin/markets.jsp").forward(req, resp);
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
-        StringBuilder sql = new StringBuilder("SELECT * FROM markets WHERE status=?");
-        if (regionFilter != null) sql.append(" AND region_id=").append(Integer.parseInt(regionFilter));
-        sql.append(" ORDER BY market_name");
-
-        PreparedStatement ps = conn.prepareStatement(sql.toString());
-        ps.setString(1, statusFilter);
-        ResultSet rs = ps.executeQuery();
-        List<Market> list = new ArrayList<>();
-        while (rs.next()) list.add(mapMarket(rs));
-        send(ex, 200, gson.toJson(list));
     }
 
-    private void handlePost(HttpExchange ex) throws Exception {
-        Market m = gson.fromJson(body(ex), Market.class);
-        if (!m.isValid()) { send(ex, 400, "{\"error\":\"Invalid market data\"}"); return; }
-        Connection conn = DatabaseConfig.getConnection();
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
 
-        // verify region exists
-        PreparedStatement regChk = conn.prepareStatement("SELECT 1 FROM regions WHERE region_id=?");
-        regChk.setInt(1, m.getRegionId());
-        if (!regChk.executeQuery().next()) { send(ex, 400, "{\"error\":\"Region does not exist\"}"); return; }
+        HttpSession session = req.getSession();
+        if (session.getAttribute("userId") == null) {
+            resp.sendRedirect(req.getContextPath() + "/login?error=Please login first");
+            return;
+        }
 
-        // unique name per region
-        PreparedStatement dupChk = conn.prepareStatement(
-            "SELECT 1 FROM markets WHERE LOWER(market_name)=LOWER(?) AND region_id=?");
-        dupChk.setString(1, m.getMarketName()); dupChk.setInt(2, m.getRegionId());
-        if (dupChk.executeQuery().next()) { send(ex, 409, "{\"error\":\"Market name already exists in this region\"}"); return; }
+        String userRole = (String) session.getAttribute("userRole");
+        if (!("ADMIN".equals(userRole))) {
+            resp.sendRedirect(req.getContextPath() + "/login?error=Admin access required");
+            return;
+        }
 
-        PreparedStatement ps = conn.prepareStatement(
-            "INSERT INTO markets(market_name,physical_address,town,country,latitude,longitude,operating_days,operating_hours,status,date_registered,region_id) VALUES(?,?,?,?,?,?,?,?,?,NOW(),?)",
-            Statement.RETURN_GENERATED_KEYS);
-        ps.setString(1, m.getMarketName());
-        ps.setString(2, m.getPhysicalAddress());
-        ps.setString(3, m.getTown());
-        ps.setString(4, m.getCountry() != null ? m.getCountry() : "KEN");
-        ps.setDouble(5, m.getLatitude());
-        ps.setDouble(6, m.getLongitude());
-        ps.setString(7, m.getOperatingDays());
-        ps.setString(8, m.getOperatingHours());
-        ps.setString(9, m.getStatus() != null ? m.getStatus() : "ACTIVE");
-        ps.setInt(10, m.getRegionId());
-        ps.executeUpdate();
-        ResultSet keys = ps.getGeneratedKeys();
-        if (keys.next()) m.setMarketId(keys.getInt(1));
-        send(ex, 201, gson.toJson(m));
-    }
+        try {
+            String action = req.getParameter("action");
 
-    private void handlePut(HttpExchange ex, Integer id) throws Exception {
-        if (id == null) { send(ex, 400, "{\"error\":\"ID required\"}"); return; }
-        Market m = gson.fromJson(body(ex), Market.class);
-        if (!m.isValid()) { send(ex, 400, "{\"error\":\"Invalid market data\"}"); return; }
-        Connection conn = DatabaseConfig.getConnection();
+            if ("add".equals(action)) {
+                String marketName = req.getParameter("marketName");
+                String town = req.getParameter("town");
+                int regionId = Integer.parseInt(req.getParameter("regionId"));
+                String operatingDays = req.getParameter("operatingDays");
 
-        PreparedStatement dupChk = conn.prepareStatement(
-            "SELECT 1 FROM markets WHERE LOWER(market_name)=LOWER(?) AND region_id=? AND market_id<>?");
-        dupChk.setString(1, m.getMarketName()); dupChk.setInt(2, m.getRegionId()); dupChk.setInt(3, id);
-        if (dupChk.executeQuery().next()) { send(ex, 409, "{\"error\":\"Market name already exists in this region\"}"); return; }
+                String sql = "INSERT INTO markets (market_name, town, region_id, operating_days, status, date_registered) " +
+                           "VALUES (?, ?, ?, ?, 'ACTIVE', NOW())";
 
-        PreparedStatement ps = conn.prepareStatement(
-            "UPDATE markets SET market_name=?,physical_address=?,town=?,operating_days=?,operating_hours=?,status=?,region_id=? WHERE market_id=?");
-        ps.setString(1, m.getMarketName());
-        ps.setString(2, m.getPhysicalAddress());
-        ps.setString(3, m.getTown());
-        ps.setString(4, m.getOperatingDays());
-        ps.setString(5, m.getOperatingHours());
-        ps.setString(6, m.getStatus());
-        ps.setInt(7, m.getRegionId());
-        ps.setInt(8, id);
-        int rows = ps.executeUpdate();
-        if (rows == 0) send(ex, 404, "{\"error\":\"Market not found\"}");
-        else { m.setMarketId(id); send(ex, 200, gson.toJson(m)); }
-    }
+                try (Connection conn = DBConnection.getConnection();
+                     PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.setString(1, marketName);
+                    ps.setString(2, town);
+                    ps.setInt(3, regionId);
+                    ps.setString(4, operatingDays);
+                    ps.executeUpdate();
+                }
 
-    private void handleDelete(HttpExchange ex, Integer id) throws Exception {
-        if (id == null) { send(ex, 400, "{\"error\":\"ID required\"}"); return; }
-        Connection conn = DatabaseConfig.getConnection();
-        // soft delete — preserve price history
-        PreparedStatement ps = conn.prepareStatement("UPDATE markets SET status='INACTIVE' WHERE market_id=?");
-        ps.setInt(1, id);
-        int rows = ps.executeUpdate();
-        if (rows == 0) send(ex, 404, "{\"error\":\"Market not found\"}");
-        else send(ex, 200, "{\"message\":\"Market deactivated\"}");
-    }
+                resp.sendRedirect(req.getContextPath() + "/admin/markets?success=Market added");
+            } else if ("delete".equals(action)) {
+                int marketId = Integer.parseInt(req.getParameter("marketId"));
 
-    private Market mapMarket(ResultSet rs) throws SQLException {
-        Market m = new Market();
-        m.setMarketId(rs.getInt("market_id"));
-        m.setMarketName(rs.getString("market_name"));
-        m.setPhysicalAddress(rs.getString("physical_address"));
-        m.setTown(rs.getString("town"));
-        m.setCountry(rs.getString("country"));
-        m.setLatitude(rs.getDouble("latitude"));
-        m.setLongitude(rs.getDouble("longitude"));
-        m.setOperatingDays(rs.getString("operating_days"));
-        m.setOperatingHours(rs.getString("operating_hours"));
-        m.setStatus(rs.getString("status"));
-        m.setDateRegistered(rs.getString("date_registered"));
-        m.setRegionId(rs.getInt("region_id"));
-        return m;
-    }
+                String sql = "UPDATE markets SET status = 'INACTIVE' WHERE market_id = ?";
 
-    private String body(HttpExchange ex) throws IOException { return new String(ex.getRequestBody().readAllBytes()); }
-    private Integer parseId(String s) { try { return Integer.parseInt(s); } catch (Exception e) { return null; } }
-    private void addCors(HttpExchange ex) {
-        ex.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
-        ex.getResponseHeaders().add("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-        ex.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type");
-    }
-    private void send(HttpExchange ex, int code, String json) throws IOException {
-        ex.getResponseHeaders().add("Content-Type", "application/json");
-        byte[] bytes = json.getBytes();
-        ex.sendResponseHeaders(code, bytes.length);
-        ex.getResponseBody().write(bytes);
-        ex.getResponseBody().close();
+                try (Connection conn = DBConnection.getConnection();
+                     PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.setInt(1, marketId);
+                    ps.executeUpdate();
+                }
+
+                resp.sendRedirect(req.getContextPath() + "/admin/markets?success=Market deactivated");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.sendRedirect(req.getContextPath() + "/admin/markets?error=" + e.getMessage());
+        }
     }
 }
