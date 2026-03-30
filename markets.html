@@ -67,6 +67,12 @@
     </div>
   </div>
 
+  <footer class="site-footer">
+    <p>© <span id="footerYear">2026</span> AgroMarket Price Intelligence</p>
+    <p class="site-footer__status">API Status: <span class="status-dot status-dot--ok">●</span></p>
+  </footer>
+
+  <script>document.getElementById('footerYear').textContent = new Date().getFullYear();</script>
   <script src="admin-markets.js"></script>
 </body>
 </html>
