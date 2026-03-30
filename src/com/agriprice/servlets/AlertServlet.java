@@ -17,9 +17,13 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @WebServlet("/alerts")
 public class AlertServlet extends HttpServlet {
+
+    private static final Logger log = LoggerFactory.getLogger(AlertServlet.class);
 
     // Show user's price alerts
     @Override
@@ -60,7 +64,7 @@ public class AlertServlet extends HttpServlet {
                 alerts.add(alert);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to load alerts for user {}", userId, e);
             req.setAttribute("error", "Failed to load alerts: " + e.getMessage());
         }
 
@@ -78,7 +82,7 @@ public class AlertServlet extends HttpServlet {
                 p.put("productName", rs.getString("product_name"));
                 products.add(p);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { log.error("Failed to load products for alert form", e); }
 
         List<Map<String, Object>> markets = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection();
@@ -91,7 +95,7 @@ public class AlertServlet extends HttpServlet {
                 m.put("marketName", rs.getString("market_name"));
                 markets.add(m);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { log.error("Failed to load markets for alert form", e); }
 
         req.setAttribute("products", products);
         req.setAttribute("markets", markets);
@@ -133,7 +137,7 @@ public class AlertServlet extends HttpServlet {
                 ps.setString(5, alertDirection);
                 ps.executeUpdate();
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Failed to create alert for user {}", userId, e);
                 resp.sendRedirect(req.getContextPath() + "/alerts?error=Failed to create alert: " + e.getMessage());
                 return;
             }
@@ -156,7 +160,7 @@ public class AlertServlet extends HttpServlet {
                 ps.setInt(4, userId);
                 ps.executeUpdate();
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Failed to update alert for user {}", userId, e);
                 resp.sendRedirect(req.getContextPath() + "/alerts?error=Failed to update alert: " + e.getMessage());
                 return;
             }
@@ -169,7 +173,7 @@ public class AlertServlet extends HttpServlet {
                 ps.setInt(2, userId);
                 ps.executeUpdate();
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Failed to delete alert for user {}", userId, e);
                 resp.sendRedirect(req.getContextPath() + "/alerts?error=Failed to delete alert");
                 return;
             }

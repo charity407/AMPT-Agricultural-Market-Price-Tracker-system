@@ -19,9 +19,13 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @WebServlet("/reports")
 public class ReportServlet extends HttpServlet {
+
+    private static final Logger log = LoggerFactory.getLogger(ReportServlet.class);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -95,7 +99,7 @@ public class ReportServlet extends HttpServlet {
                 summary.add(row);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error generating summary report", e);
             req.setAttribute("error", "Error generating report: " + e.getMessage());
         }
 
@@ -111,7 +115,7 @@ public class ReportServlet extends HttpServlet {
                 p.put("productName", rs.getString("product_name"));
                 products.add(p);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { log.error("Failed to load products for report filter", e); }
 
         List<Map<String, Object>> markets = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection();
@@ -124,7 +128,7 @@ public class ReportServlet extends HttpServlet {
                 m.put("marketName", rs.getString("market_name"));
                 markets.add(m);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { log.error("Failed to load markets for report filter", e); }
 
         req.setAttribute("summary", summary);
         req.setAttribute("products", products);
@@ -137,7 +141,7 @@ public class ReportServlet extends HttpServlet {
         try {
             req.getRequestDispatcher("/jsp/reports/summary.jsp").forward(req, resp);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to forward to summary.jsp", e);
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to generate report");
         }
     }
@@ -202,7 +206,7 @@ public class ReportServlet extends HttpServlet {
                              rs.getString("full_name") + "\"");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error generating CSV report", e);
             writer.println("Error generating report: " + e.getMessage());
         }
 
