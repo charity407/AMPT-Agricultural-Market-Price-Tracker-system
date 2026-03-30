@@ -6,11 +6,23 @@
 /.settings/
 /.vscode/
 
+# Maven build artifacts
+/target/
+
+# Backup files
+*.bak
+
 # library jars (kept locally only)
 lib/*.jar
 
-# other
-*.log
+# IDE and system files
+.DS_Store
+*.swp
+*.swo
+*~
 
-
+# Database config (local only)
 src/com/agriprice/utils/db.properties
+
+# Logs
+*.log
