@@ -78,24 +78,26 @@ psql -U postgres -d agri_price_tracker -f sql/sample_data.sql
 All URL patterns are defined in `WebContent/WEB-INF/web.xml`.
 **Check this file before creating a new Servlet to avoid duplicate URLs.**
 
-| URL Pattern         | Servlet Class         | Methods   |
-| ------------------- | --------------------- | --------- |
-| `/login`            | LoginServlet          | GET, POST |
-| `/register`         | RegisterServlet       | GET, POST |
-| `/logout`           | LogoutServlet         | GET       |
-| `/profile`          | ProfileServlet        | GET, POST |
-| `/admin/users`      | UserManagementServlet | GET, POST |
-| `/admin/categories` | CategoryServlet       | GET, POST |
-| `/admin/products`   | ProductServlet        | GET, POST |
-| `/admin/markets`    | MarketServlet         | GET, POST |
-| `/admin/regions`    | RegionServlet         | GET, POST |
-| `/prices/entry`     | PriceEntryServlet     | GET, POST |
-| `/prices/list`      | PriceListServlet      | GET       |
-| `/prices/edit`      | PriceEditServlet      | GET, POST |
-| `/prices/compare`   | PriceCompareServlet   | GET       |
-| `/prices/trends`    | PriceTrendServlet     | GET       |
-| `/alerts`           | AlertServlet          | GET, POST |
-| `/reports`          | ReportServlet         | GET       |
+| URL Pattern         | Servlet Class         | JSP Page | Methods   |
+| ------------------- | --------------------- | -------- | --------- |
+| `/login`            | LoginServlet          | login.html | GET, POST |
+| `/register`         | RegisterServlet       | register.html | GET, POST |
+| `/logout`           | LogoutServlet         | — | GET       |
+| `/profile`          | ProfileServlet        | — | GET, POST |
+| `/admin/users`      | UserManagementServlet | — | GET, POST |
+| `/admin/categories` | CategoryServlet       | — | GET, POST |
+| `/admin/products`   | ProductServlet        | jsp/admin/products.jsp ✅ | GET, POST |
+| `/admin/markets`    | MarketServlet         | jsp/admin/markets.jsp ✅ | GET, POST |
+| `/admin/regions`    | RegionServlet         | — | GET, POST |
+| `/prices/entry`     | PriceEntryServlet     | jsp/prices/entry.jsp | GET, POST |
+| `/prices/list`      | PriceListServlet      | jsp/prices/list.jsp | GET       |
+| `/prices/edit`      | PriceEditServlet      | jsp/prices/edit.jsp | GET, POST |
+| `/prices/compare`   | PriceCompareServlet   | jsp/prices/compare.jsp | GET       |
+| `/prices/trends`    | PriceTrendServlet     | jsp/trends/trends.jsp | GET       |
+| `/alerts`           | AlertServlet          | jsp/alerts/alerts.jsp | GET, POST |
+| `/reports`          | ReportServlet         | jsp/reports/summary.jsp | GET       |
+
+**✅ Recently Integrated:** Product and Market admin pages now have full JSP integration with dynamic database queries.
 
 ---
 
@@ -109,6 +111,24 @@ UI/UX design files, wireframes, mockups, and prototypes for AgriPrice KE. All de
 - **PDF Exports**: Stored in `design/` folder, committed to Git for reference
 - **Local PDF**: `design/Soko Intel design.pdf` (added from `/home/mukanga/Downloads/Soko Intel design.pdf`)
 - **Prototype Link**: [https://www.figma.com/proto/ZkAIYImhF6poMwlFxfOEJM/Untitled?node-id=1-3&t=Nz2JfNdVM1Et12CH-1](https://www.figma.com/proto/ZkAIYImhF6poMwlFxfOEJM/Untitled?node-id=1-3&t=Nz2JfNdVM1Et12CH-1) _(interactive prototype for testing)_
+
+---
+
+## Architecture & Integration
+
+### Servlet-JSP Pattern
+All backend servlets follow a standard pattern:
+1. **Servlet** receives request, queries database, sets request attributes
+2. **JSP** receives attributes via `RequestDispatcher.forward()`, renders HTML
+3. **Session** manages authentication and user roles
+
+### Admin Pages Integration (March 2026)
+Recent updates fully integrated the admin pages with backend:
+- **Product Management** (`/admin/products`) - Lists products with dynamic database queries
+- **Market Management** (`/admin/markets`) - Lists markets with dynamic database queries
+- Both pages include Create/Update/Delete functionality with form validation
+
+See [INTEGRATION_TEST.md](INTEGRATION_TEST.md) for complete integration verification report.
 
 ---
 

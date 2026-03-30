@@ -59,8 +59,12 @@ psql -U postgres -d agri_price_tracker -c "SELECT COUNT(*) FROM users;"
 ### Option A: Maven (Recommended)
 
 ```bash
-# Build WAR file
+# Build WAR file (includes JSP admin pages as of March 2026)
 mvn clean package
+
+# Verify build includes JSP files
+unzip -l target/agri-price-tracker.war | grep ".jsp"
+# Should show jsp/admin/products.jsp, jsp/admin/markets.jsp, etc.
 
 # Deploy to Tomcat
 cp target/agri-price-tracker.war $CATALINA_HOME/webapps/
@@ -104,12 +108,23 @@ Use these test credentials:
 
 ## Verify Installation
 
-✅ Homepage loads  
-✅ Can login with test credentials  
-✅ Dashboard displays  
-✅ Can view prices  
+✅ Homepage loads
+✅ Can login with test credentials
+✅ Dashboard displays
+✅ Can view prices
+✅ **Admin pages load** (NEW):
+   - Products admin: `/admin/products` (requires admin role)
+   - Markets admin: `/admin/markets` (requires admin role)
 
 If all ✅, your system is **ready to use**!
+
+### Admin Access (March 2026 Update)
+
+Login with admin credentials, then visit:
+- **Products**: http://localhost:8080/agri-price-tracker/admin/products
+- **Markets**: http://localhost:8080/agri-price-tracker/admin/markets
+
+Both pages now have full backend integration with dynamic database queries.
 
 ---
 
@@ -129,4 +144,4 @@ For testing, see **TEST.md**.
 
 ---
 
-*Last Updated: March 29, 2026*
+*Last Updated: March 30, 2026* (Updated with admin page integration)

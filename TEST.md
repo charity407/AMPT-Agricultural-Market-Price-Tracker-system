@@ -100,10 +100,26 @@ mvn clean package
 # Verify: ls -lh target/agri-price-tracker.war
 ```
 
-### Verify WAR Contents
+### Verify WAR Contents ✅ UPDATED
 ```bash
-jar tf target/agri-price-tracker.war | head -20
-# Expected: WEB-INF/, META-INF/, com/agriprice/*, jsp files
+# List all JSP files in WAR (added March 2026)
+unzip -l target/agri-price-tracker.war | grep ".jsp"
+
+# Expected output should include:
+#   jsp/admin/products.jsp  ✅ NEW
+#   jsp/admin/markets.jsp   ✅ NEW
+#   jsp/prices/entry.jsp
+#   jsp/prices/list.jsp
+#   jsp/alerts/alerts.jsp
+#   jsp/reports/summary.jsp
+#   jsp/prices/edit.jsp
+#   jsp/prices/compare.jsp
+#   jsp/trends/trends.jsp
+
+# Verify servlets are compiled
+jar tf target/agri-price-tracker.war | grep "ProductServlet.class"
+jar tf target/agri-price-tracker.war | grep "MarketServlet.class"
+# Expected: Both should be present
 ```
 
 ### Deploy to Tomcat
@@ -171,31 +187,50 @@ SELECT password_hash FROM users WHERE username = 'testuser_001';
 
 ---
 
-### Test 3: Product & Market Management
+### Test 3: Product & Market Management (JSP Integration) ✅ NEW
+
+**🔗 URL Paths:**
+- Products: `http://localhost:8080/agri-price-tracker/admin/products`
+- Markets: `http://localhost:8080/agri-price-tracker/admin/markets`
+
 **Steps:**
 1. Login as Admin (use test credentials below)
-2. Navigate to Products page
-3. Click "Add New Product"
-4. Fill form:
+2. Navigate to `/admin/products`
+3. Verify product list loads from database
+4. Click "Add Product" button
+5. Fill form:
    - **Product Name**: `Maize (Corn)`
-   - **Category**: `Grains`
+   - **Category**: `CEREALS`
    - **Unit**: `50kg bag`
-5. Submit
-6. Verify product appears in list
-7. Repeat for Markets and Regions
+6. Submit form
+7. Verify product appears in list (should see it immediately)
+8. Repeat for Markets at `/admin/markets`
 
 **Expected Results:**
-- ✅ Products, Markets, and Regions can be created
-- ✅ Data persists after refresh
-- ✅ No duplicate entries accepted
-- ✅ CRUD operations work (Create, Read, Update, Delete)
+- ✅ Products list displays data from database via ProductServlet
+- ✅ Markets list displays data from database via MarketServlet
+- ✅ Forms submit to backend servlet (POST request)
+- ✅ New items appear in table immediately after add
+- ✅ Data persists after refresh (database is source of truth)
+- ✅ Session validation prevents unauthorized access
+- ✅ Admin role required to access these pages
 
-**Database Verification:**
+**Backend Verification (New March 2026):**
 ```sql
-SELECT COUNT(*) FROM products;
-SELECT * FROM markets;
-SELECT * FROM regions;
+-- Verify servlet queries return data
+SELECT COUNT(*) as total_products FROM products;
+SELECT COUNT(*) as total_markets FROM markets;
+
+-- Check for recent additions
+SELECT product_id, product_name, is_active FROM products ORDER BY product_id DESC LIMIT 3;
+SELECT market_id, market_name, status FROM markets ORDER BY market_id DESC LIMIT 3;
 ```
+
+**Security Test:**
+1. Try to access `/admin/products` without login
+2. Should redirect to login page ✅
+3. Login as non-admin user
+4. Should see "Admin access required" error ✅
 
 ---
 
@@ -613,17 +648,55 @@ Log Error: org.postgresql.util.PSQLException: ERROR: foreign key violation
 
 ---
 
+## Backend-Frontend Integration Testing ✅ NEW
+
+See [INTEGRATION_TEST.md](INTEGRATION_TEST.md) for comprehensive backend-frontend integration verification report.
+
+**Integration Status (March 2026):**
+- ✅ ProductServlet fully integrated with JSP
+- ✅ MarketServlet fully integrated with JSP
+- ✅ CategoryServlet implemented as HttpServlet
+- ✅ RegionServlet implemented as HttpServlet
+- ✅ All servlet-JSP pairs properly forwarding data
+- ✅ Session management and access control working
+- ✅ WAR build includes all JSP files
+
+**Test the Integration:**
+```bash
+# 1. Build the project
+mvn clean package
+
+# 2. Deploy WAR file
+cp target/agri-price-tracker.war $CATALINA_HOME/webapps/
+
+# 3. Restart Tomcat
+$CATALINA_HOME/bin/shutdown.sh
+sleep 2
+$CATALINA_HOME/bin/startup.sh
+
+# 4. Test admin pages (requires admin login)
+# Products: http://localhost:8080/agri-price-tracker/admin/products
+# Markets:  http://localhost:8080/agri-price-tracker/admin/markets
+
+# 5. Verify database queries are working
+psql -U postgres -d agri_price_tracker -c "SELECT COUNT(*) FROM products;"
+psql -U postgres -d agri_price_tracker -c "SELECT COUNT(*) FROM markets;"
+```
+
+---
+
 ## Next Steps
 
 - [ ] Set up automated unit tests (JUnit 5)
 - [ ] Add integration tests (TestNG)
 - [ ] Configure CI/CD pipeline (GitHub Actions)
-- [ ] Set up Selenium for UI automation
+- [ ] Set up Selenium for UI automation (test JSP pages)
 - [ ] Add performance testing with JMeter
 - [ ] Implement monitoring (AppInsights, DataDog)
+- [ ] Create JSP pages for Categories and Regions admin
 
 ---
 
-*Last Updated: March 29, 2026*
-*Test Guide Version: 1.0*
-*Maintained by: QA Team (Member 7)*
+*Last Updated: March 30, 2026*
+*Test Guide Version: 1.1*
+*Maintained by: QA Team (Member 7) + Integration by Member 4*
