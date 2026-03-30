@@ -107,6 +107,7 @@ UI/UX design files, wireframes, mockups, and prototypes for AgriPrice KE. All de
 
 - **Figma Design System**: [https://www.figma.com/design/ZkAIYImhF6poMwlFxfOEJM/Untitled?node-id=1-3&t=Nz2JfNdVM1Et12CH-1](https://www.figma.com/design/ZkAIYImhF6poMwlFxfOEJM/Untitled?node-id=1-3&t=Nz2JfNdVM1Et12CH-1)
 - **PDF Exports**: Stored in `design/` folder, committed to Git for reference
+- **Local PDF**: `design/Soko Intel design.pdf` (added from `/home/mukanga/Downloads/Soko Intel design.pdf`)
 - **Prototype Link**: [https://www.figma.com/proto/ZkAIYImhF6poMwlFxfOEJM/Untitled?node-id=1-3&t=Nz2JfNdVM1Et12CH-1](https://www.figma.com/proto/ZkAIYImhF6poMwlFxfOEJM/Untitled?node-id=1-3&t=Nz2JfNdVM1Et12CH-1) _(interactive prototype for testing)_
 
 ---
@@ -140,4 +141,3 @@ psql --version
 - **Admin:** admin@agriprice.ke / admin123
 - **Market Agent:** agent@agriprice.ke / agent123
 - **Farmer:** farmer@agriprice.ke / farmer123
-
