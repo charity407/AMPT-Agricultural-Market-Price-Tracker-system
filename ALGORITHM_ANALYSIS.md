@@ -6,12 +6,13 @@ Comprehensive analysis of algorithms, sorting, filtering, and data processing te
 
 ## Summary
 
-The codebase **primarily uses SQL-level sorting and filtering** rather than in-memory algorithms. There are **no complex algorithmic implementations** (e.g., binary search, tree structures, custom sorting algorithms), but the system effectively uses:
+The codebase **primarily uses SQL-level sorting and filtering** rather than in-memory algorithms. The system effectively uses:
 
 - ✅ **SQL ORDER BY** - Database-level sorting
 - ✅ **SQL WHERE clauses** - Database-level filtering
 - ✅ **String parsing** - Array splitting for comma-separated values
 - ✅ **List iteration** - Loop-based data processing
+- ✅ **Java Search & Sort Algorithms** - In-memory implementations for specific use cases (added for analysis and potential optimization)
 
 ---
 
@@ -289,11 +290,116 @@ while (rs.next()) {
 
 ---
 
+### 5. **Java Search & Sort Algorithms** - `AlgorithmUtils.java`
+
+**Location**: `src/com/agriprice/utils/AlgorithmUtils.java`
+
+These algorithms are implemented in Java for in-memory processing of data retrieved from the database. They complement the SQL-based operations for scenarios requiring client-side computation.
+
+#### A. **Linear Search Algorithm**
+```java
+public static int linearSearch(List<String> products, String target) {
+    for (int i = 0; i < products.size(); i++) {
+        if (products.get(i).equalsIgnoreCase(target)) {
+            return i;
+        }
+    }
+    return -1;
+}
+```
+**Purpose**: Searches for a product name in an unsorted list
+**Algorithm Type**: Sequential search
+**Time Complexity**: O(n)
+**Space Complexity**: O(1)
+**Use Case**: Finding a product by name when list is small or unsorted
+
+#### B. **Binary Search Algorithm**
+```java
+public static int binarySearch(List<String> products, String target) {
+    int left = 0;
+    int right = products.size() - 1;
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        int comparison = products.get(mid).compareToIgnoreCase(target);
+        if (comparison == 0) return mid;
+        else if (comparison < 0) left = mid + 1;
+        else right = mid - 1;
+    }
+    return -1;
+}
+```
+**Purpose**: Searches for a product name in a sorted list
+**Algorithm Type**: Divide and conquer search
+**Time Complexity**: O(log n)
+**Space Complexity**: O(1)
+**Use Case**: Efficient lookup in pre-sorted product lists
+
+#### C. **Bubble Sort Algorithm**
+```java
+public static void bubbleSort(List<Double> prices) {
+    int n = prices.size();
+    boolean swapped;
+    for (int i = 0; i < n - 1; i++) {
+        swapped = false;
+        for (int j = 0; j < n - i - 1; j++) {
+            if (prices.get(j) > prices.get(j + 1)) {
+                double temp = prices.get(j);
+                prices.set(j, prices.get(j + 1));
+                prices.set(j + 1, temp);
+                swapped = true;
+            }
+        }
+        if (!swapped) break;
+    }
+}
+```
+**Purpose**: Sorts a list of prices in ascending order
+**Algorithm Type**: Comparison sort with early termination
+**Time Complexity**: O(n²) worst case, O(n) best case
+**Space Complexity**: O(1)
+**Use Case**: Small datasets or educational purposes; not recommended for large lists
+
+#### D. **Quick Sort Algorithm**
+```java
+public static void quickSort(List<Double> prices, int low, int high) {
+    if (low < high) {
+        int pivotIndex = partition(prices, low, high);
+        quickSort(prices, low, pivotIndex - 1);
+        quickSort(prices, pivotIndex + 1, high);
+    }
+}
+```
+**Purpose**: Efficiently sorts a list of prices using divide and conquer
+**Algorithm Type**: Recursive comparison sort
+**Time Complexity**: O(n log n) average, O(n²) worst case
+**Space Complexity**: O(log n) due to recursion
+**Use Case**: General-purpose sorting for price data
+
+#### E. **Min-Max Price Finder**
+```java
+public static double[] findMinMaxPrices(List<Double> prices) {
+    if (prices.isEmpty()) return new double[]{0.0, 0.0};
+    double min = prices.get(0), max = prices.get(0);
+    for (double price : prices) {
+        if (price < min) min = price;
+        if (price > max) max = price;
+    }
+    return new double[]{min, max};
+}
+```
+**Purpose**: Finds minimum and maximum prices in a list
+**Algorithm Type**: Linear scan
+**Time Complexity**: O(n)
+**Space Complexity**: O(1)
+**Use Case**: Quick statistics on price ranges
+
+---
+
 ## 🔧 Code Quality Assessment
 
 | Metric | Rating | Notes |
 |--------|--------|-------|
-| **Algorithm Complexity** | ⭐⭐⭐⭐ | Simple, straightforward (no complex algorithms needed) |
+| **Algorithm Complexity** | ⭐⭐⭐⭐⭐ | Includes both SQL-based and Java-implemented algorithms (linear search, binary search, sorting) |
 | **Database Optimization** | ⭐⭐⭐⭐ | Good use of SQL ORDER BY, filtering at database level |
 | **Code Readability** | ⭐⭐⭐⭐ | Clear intent, well-organized |
 | **Performance** | ⭐⭐⭐ | Good, but minor optimizations possible |
