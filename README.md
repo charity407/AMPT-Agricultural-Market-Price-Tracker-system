@@ -195,27 +195,27 @@ UI/UX design files, wireframes, mockups, and prototypes for AgriPrice KE. All de
 
 | Design Asset                | Location/Link                                        | Owner | Format         |
 | --------------------------- | ---------------------------------------------------- | ----- | -------------- |
-| **Desktop Wireframes**       | `design/wireframes/desktop/`                         | M5    | Figma / PDF    |
-| **Mobile Wireframes**        | `design/wireframes/mobile/`                          | M5    | Figma / PDF    |
-| **UI Component Library**     | `design/components/`                                 | M5    | Figma          |
-| **Style Guide & Brand Kit**  | `design/brand-kit/agriprice-style-guide.pdf`         | M5    | PDF / Figma    |
-| **Dashboard Mockup**         | `design/mockups/dashboard-admin.fig`                 | M5    | Figma          |
-| **Login/Register Screens**   | `design/mockups/auth-screens.fig`                    | M5    | Figma          |
-| **Price Entry Form**         | `design/mockups/price-entry.fig`                     | M6    | Figma          |
-| **Price List & Filters**     | `design/mockups/price-list.fig`                      | M6    | Figma          |
-| **Market Comparison View**   | `design/mockups/compare-markets.fig`                 | M6    | Figma          |
-| **Trend Chart / Analytics**  | `design/mockups/trends-chart.fig`                    | M6    | Figma          |
-| **Price Alerts Page**        | `design/mockups/alerts-management.fig`               | M6    | Figma          |
-| **User Profile Page**        | `design/mockups/user-profile.fig`                    | M6    | Figma          |
-| **Admin Management Pages**   | `design/mockups/admin-users-products-markets.fig`    | M5/M6 | Figma          |
+| **Desktop Wireframes**       | [Figma Design System](https://www.figma.com/design/ZkAIYImhF6poMwlFxfOEJM/Untitled?node-id=1-3&t=Nz2JfNdVM1Et12CH-1) | M5    | Figma / PDF    |
+| **Mobile Wireframes**        | [Figma Design System](https://www.figma.com/design/ZkAIYImhF6poMwlFxfOEJM/Untitled?node-id=1-3&t=Nz2JfNdVM1Et12CH-1) | M5    | Figma / PDF    |
+| **UI Component Library**     | [Figma Design System](https://www.figma.com/design/ZkAIYImhF6poMwlFxfOEJM/Untitled?node-id=1-3&t=Nz2JfNdVM1Et12CH-1) | M5    | Figma          |
+| **Style Guide & Brand Kit**  | [Figma Design System](https://www.figma.com/design/ZkAIYImhF6poMwlFxfOEJM/Untitled?node-id=1-3&t=Nz2JfNdVM1Et12CH-1) | M5    | PDF / Figma    |
+| **Dashboard Mockup**         | [Figma Design System](https://www.figma.com/design/ZkAIYImhF6poMwlFxfOEJM/Untitled?node-id=1-3&t=Nz2JfNdVM1Et12CH-1) | M5    | Figma          |
+| **Login/Register Screens**   | [Figma Design System](https://www.figma.com/design/ZkAIYImhF6poMwlFxfOEJM/Untitled?node-id=1-3&t=Nz2JfNdVM1Et12CH-1) | M5    | Figma          |
+| **Price Entry Form**         | [Figma Design System](https://www.figma.com/design/ZkAIYImhF6poMwlFxfOEJM/Untitled?node-id=1-3&t=Nz2JfNdVM1Et12CH-1) | M6    | Figma          |
+| **Price List & Filters**     | [Figma Design System](https://www.figma.com/design/ZkAIYImhF6poMwlFxfOEJM/Untitled?node-id=1-3&t=Nz2JfNdVM1Et12CH-1) | M6    | Figma          |
+| **Market Comparison View**   | [Figma Design System](https://www.figma.com/design/ZkAIYImhF6poMwlFxfOEJM/Untitled?node-id=1-3&t=Nz2JfNdVM1Et12CH-1) | M6    | Figma          |
+| **Trend Chart / Analytics**  | [Figma Design System](https://www.figma.com/design/ZkAIYImhF6poMwlFxfOEJM/Untitled?node-id=1-3&t=Nz2JfNdVM1Et12CH-1) | M6    | Figma          |
+| **Price Alerts Page**        | [Figma Design System](https://www.figma.com/design/ZkAIYImhF6poMwlFxfOEJM/Untitled?node-id=1-3&t=Nz2JfNdVM1Et12CH-1) | M6    | Figma          |
+| **User Profile Page**        | [Figma Design System](https://www.figma.com/design/ZkAIYImhF6poMwlFxfOEJM/Untitled?node-id=1-3&t=Nz2JfNdVM1Et12CH-1) | M6    | Figma          |
+| **Admin Management Pages**   | [Figma Design System](https://www.figma.com/design/ZkAIYImhF6poMwlFxfOEJM/Untitled?node-id=1-3&t=Nz2JfNdVM1Et12CH-1) | M5/M6 | Figma          |
 | **Responsive Breakpoints**   | `design/responsive/breakpoints.md`                   | M5    | Markdown       |
 | **Accessibility Guidelines** | `design/guidelines/accessibility.md`                 | M5    | Markdown       |
 
 ### Design File Access
 
-- **Figma Design System**: [https://figma.com/...agriprice-ke](https://figma.com) _(shared with M5, M6, M7)_
+- **Figma Design System**: [https://www.figma.com/design/ZkAIYImhF6poMwlFxfOEJM/Untitled?node-id=1-3&t=Nz2JfNdVM1Et12CH-1](https://www.figma.com/design/ZkAIYImhF6poMwlFxfOEJM/Untitled?node-id=1-3&t=Nz2JfNdVM1Et12CH-1) _(shared with M5, M6, M7)_
 - **PDF Exports**: Stored in `design/` folder, committed to Git for reference
-- **Prototype Link**: [https://www.figma.com/proto/...](https://www.figma.com/proto/) _(interactive prototype for testing)_
+- **Prototype Link**: [https://www.figma.com/proto/ZkAIYImhF6poMwlFxfOEJM/Untitled?node-id=1-3&t=Nz2JfNdVM1Et12CH-1](https://www.figma.com/proto/ZkAIYImhF6poMwlFxfOEJM/Untitled?node-id=1-3&t=Nz2JfNdVM1Et12CH-1) _(interactive prototype for testing)_
 
 ### Design Ownership & Modification Rules
 
