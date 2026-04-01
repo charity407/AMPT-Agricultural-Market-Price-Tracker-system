@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/alerts/check") // Optional: can be called manually or via cron
+ // Optional: can be called manually or via cron
 public class AlertCheckServlet extends HttpServlet {
 
     @Override

@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet("/prices/entry")
+
 public class PriceEntryServlet extends HttpServlet {
 
     // Show the entry form

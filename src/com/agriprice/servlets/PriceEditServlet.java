@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet("/prices/edit")
+
 public class PriceEditServlet extends HttpServlet {
 
     // Show the edit form for a specific price entry

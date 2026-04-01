@@ -22,7 +22,7 @@ import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@WebServlet("/reports")
+
 public class ReportServlet extends HttpServlet {
 
     private static final Logger log = LoggerFactory.getLogger(ReportServlet.class);
