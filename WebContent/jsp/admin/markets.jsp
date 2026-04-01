@@ -6,7 +6,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Manage Markets — AgroMarket Admin</title>
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/style.css" />
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet" />
 </head>
 <body>
