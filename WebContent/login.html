@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login — AgriPrice KE</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:wght@300;400;600&display=swap" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0f4f0;
+            font-family: 'Source Serif 4', serif;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.10);
+            padding: 2.5rem 2rem;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 1.75rem;
+        }
+
+        .brand h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #2e7d32;
+            letter-spacing: -0.5px;
+        }
+
+        .brand p {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.1rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.35rem;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 0.65rem 0.85rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2e7d32;
+            box-shadow: 0 0 0 2px rgba(46,125,50,0.12);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: #2e7d32;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            font-family: 'IBM Plex Mono', monospace;
+            letter-spacing: 0.5px;
+            transition: background 0.2s;
+        }
+
+        .btn:hover { background: #1b5e20; }
+
+        .error-msg {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+            border-radius: 5px;
+            padding: 0.65rem 0.85rem;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 1.25rem;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .register-link a {
+            color: #2e7d32;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .register-link a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="brand">
+            <h1>AgriPrice KE</h1>
+            <p>Agricultural Market Price Tracker</p>
+        </div>
+
+        <!-- Error message shown when ?error= param is present -->
+        <script>
+            const params = new URLSearchParams(window.location.search);
+            const err = params.get('error');
+            if (err) {
+                document.write('<div class="error-msg">' + err + '</div>');
+            }
+        </script>
+
+        <form method="POST" action="login">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com" required autofocus />
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="••••••••" required />
+            </div>
+            <button type="submit" class="btn">Sign In</button>
+        </form>
+
+        <div class="register-link">
+            Don't have an account? <a href="register">Register here</a>
+        </div>
+    </div>
+</body>
+</html>
