@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.agriprice.utils.DBConnection;
 
@@ -28,11 +31,31 @@ public class PriceEntryServlet extends HttpServlet {
             return;
         }
 
-        try {
-            req.getRequestDispatcher("/jsp/prices/entry.jsp").forward(req, resp);
+        List<String[]> products = new ArrayList<>();
+        List<String[]> markets  = new ArrayList<>();
+
+        try (Connection conn = DBConnection.getConnection()) {
+            PreparedStatement ps1 = conn.prepareStatement(
+                "SELECT product_id, product_name FROM products WHERE is_active = true ORDER BY product_name");
+            ResultSet rs1 = ps1.executeQuery();
+            while (rs1.next()) {
+                products.add(new String[]{ rs1.getString("product_id"), rs1.getString("product_name") });
+            }
+
+            PreparedStatement ps2 = conn.prepareStatement(
+                "SELECT market_id, market_name FROM markets WHERE status = 'ACTIVE' ORDER BY market_name");
+            ResultSet rs2 = ps2.executeQuery();
+            while (rs2.next()) {
+                markets.add(new String[]{ rs2.getString("market_id"), rs2.getString("market_name") });
+            }
         } catch (Exception e) {
             e.printStackTrace();
+            req.setAttribute("error", "Could not load products/markets: " + e.getMessage());
         }
+
+        req.setAttribute("products", products);
+        req.setAttribute("markets", markets);
+        req.getRequestDispatcher("/jsp/prices/entry.jsp").forward(req, resp);
     }
 
     // Handle form submission

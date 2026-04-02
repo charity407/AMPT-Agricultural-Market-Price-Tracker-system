@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Profile — AgriPrice KE</title>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet" />
   <style>
     .profile-container {
       max-width: 600px;
@@ -125,6 +126,24 @@
   </style>
 </head>
 <body>
+
+  <header class="site-header" role="banner">
+    <nav class="navbar">
+      <div class="navbar__brand">
+        <span class="navbar__logo">⬡</span>
+        <span class="navbar__name">AgriPrice KE</span>
+        <span class="navbar__tagline">Market Price Tracker</span>
+      </div>
+      <ul class="navbar__menu is-open" style="flex-direction: row; background: transparent; order: 0;">
+        <li><a href="${pageContext.request.contextPath}/dashboard.jsp" class="navbar__link">Dashboard</a></li>
+        <li><a href="${pageContext.request.contextPath}/prices/list" class="navbar__link">Prices</a></li>
+        <li><a href="${pageContext.request.contextPath}/alerts" class="navbar__link">Alerts</a></li>
+        <li><a href="${pageContext.request.contextPath}/profile" class="navbar__link is-active">Profile</a></li>
+        <li><a href="${pageContext.request.contextPath}/logout" class="navbar__link">Sign Out</a></li>
+      </ul>
+    </nav>
+  </header>
+
   <div class="profile-container">
     <div class="profile-header">
       <div class="profile-avatar">
@@ -190,7 +209,7 @@
 
       <div class="btn-group">
         <button type="submit" class="btn btn-primary">Save Changes</button>
-        <a href="<%= request.getContextPath() %>/" class="btn btn-secondary" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">Back to Home</a>
+        <a href="<%= request.getContextPath() %>/dashboard.jsp" class="btn btn-secondary" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">Back to Dashboard</a>
       </div>
     </form>
   </div>

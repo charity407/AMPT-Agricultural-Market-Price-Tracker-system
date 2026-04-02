@@ -32,7 +32,7 @@ public class ProfileServlet extends HttpServlet {
         int userId = (Integer) userIdObj;
 
         try {
-            String sql = "SELECT user_id, full_name, email_address, phone, role, account_status FROM users WHERE user_id = ?";
+            String sql = "SELECT user_id, full_name, email_address, phone_number, role, account_status FROM users WHERE user_id = ?";
 
             try (Connection conn = DBConnection.getConnection();
                  PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -43,7 +43,7 @@ public class ProfileServlet extends HttpServlet {
                     req.setAttribute("userId", rs.getInt("user_id"));
                     req.setAttribute("fullName", rs.getString("full_name"));
                     req.setAttribute("email", rs.getString("email_address"));
-                    req.setAttribute("phone", rs.getString("phone"));
+                    req.setAttribute("phone", rs.getString("phone_number"));
                     req.setAttribute("role", rs.getString("role"));
                     req.setAttribute("status", rs.getString("account_status"));
                 } else {
@@ -88,7 +88,7 @@ public class ProfileServlet extends HttpServlet {
                 return;
             }
 
-            String sql = "UPDATE users SET full_name = ?, phone = ?, email_address = ? WHERE user_id = ?";
+            String sql = "UPDATE users SET full_name = ?, phone_number = ?, email_address = ? WHERE user_id = ?";
 
             try (Connection conn = DBConnection.getConnection();
                  PreparedStatement ps = conn.prepareStatement(sql)) {
