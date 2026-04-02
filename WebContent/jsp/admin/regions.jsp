@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Manage Products — AgroMarket Admin</title>
+  <title>Geographic Regions — AgroMarket Admin</title>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet" />
 </head>
@@ -20,8 +20,8 @@
       </div>
       <ul class="navbar__menu is-open" style="flex-direction: row; background: transparent; order: 0;">
         <li><a href="${pageContext.request.contextPath}/" class="navbar__link">Dashboard</a></li>
-        <li><a href="${pageContext.request.contextPath}/admin/products" class="navbar__link is-active">Products</a></li>
         <li><a href="${pageContext.request.contextPath}/admin/markets" class="navbar__link">Markets</a></li>
+        <li><a href="${pageContext.request.contextPath}/admin/regions" class="navbar__link is-active">Regions</a></li>
       </ul>
     </nav>
   </header>
@@ -30,10 +30,10 @@
     <section class="content-section">
       <div class="section-header">
         <div>
-          <h1 class="section-header__title">Product Directory</h1>
-          <p class="section-header__sub">Manage agricultural commodities, categories, and units</p>
+          <h1 class="section-header__title">Geographic Regions</h1>
+          <p class="section-header__sub">Manage geographic regions used to organize markets across Kenya</p>
         </div>
-        <button class="btn btn--primary" id="addProductBtn" type="button">+ Add Product</button>
+        <button class="btn btn--primary" id="addRegionBtn" type="button">+ Add Region</button>
       </div>
 
       <c:if test="${not empty param.success}">
@@ -52,33 +52,32 @@
         <table class="data-table">
           <thead>
             <tr>
-              <th scope="col">Product Name</th>
-              <th scope="col">Category</th>
-              <th scope="col">Unit</th>
-              <th scope="col">Status</th>
+              <th scope="col">Region ID</th>
+              <th scope="col">Region Name</th>
               <th scope="col" class="align-right">Actions</th>
             </tr>
           </thead>
-          <tbody id="productTableBody">
-            <c:forEach var="prod" items="${productList}">
-              <tr>
-                <td><strong>${prod[1]}</strong></td>
-                <td>${prod[2]}</td>
-                <td>${prod[3]}</td>
-                <td>
-                  <span class="badge" style="background: ${prod[4] ? '#d4edda' : '#f8d7da'}; color: ${prod[4] ? '#155724' : '#721c24'};">
-                    ${prod[4] ? 'ACTIVE' : 'INACTIVE'}
-                  </span>
-                </td>
-                <td class="align-right">
-                  <form method="post" style="display: inline;">
-                    <input type="hidden" name="action" value="delete">
-                    <input type="hidden" name="productId" value="${prod[0]}">
-                    <button type="submit" class="btn btn--sm btn--ghost" onclick="return confirm('Delete this product?')">Delete</button>
-                  </form>
-                </td>
-              </tr>
-            </c:forEach>
+          <tbody>
+            <c:choose>
+              <c:when test="${not empty regions}">
+                <c:forEach var="region" items="${regions}">
+                  <tr>
+                    <td><strong>${region[0]}</strong></td>
+                    <td>${region[1]}</td>
+                    <td class="align-right">
+                      <button class="btn btn--sm btn--ghost" onclick="alert('Edit functionality coming soon')">Edit</button>
+                    </td>
+                  </tr>
+                </c:forEach>
+              </c:when>
+              <c:otherwise>
+                <tr>
+                  <td colspan="3" style="text-align: center; padding: 2rem; color: #999;">
+                    No regions found
+                  </td>
+                </tr>
+              </c:otherwise>
+            </c:choose>
           </tbody>
         </table>
       </div>
@@ -88,32 +87,18 @@
   <div class="modal-backdrop" id="modalBackdrop" hidden>
     <div class="modal">
       <div class="modal__header">
-        <h3 class="modal__title">Add New Product</h3>
+        <h3 class="modal__title">Add New Region</h3>
         <button class="modal__close" id="modalClose">✕</button>
       </div>
       <form method="post" class="modal__body">
         <input type="hidden" name="action" value="add">
         <div>
-          <label class="form-label">Product Name</label>
-          <input type="text" class="form-input" name="productName" required>
-        </div>
-        <div>
-          <label class="form-label">Category</label>
-          <select class="form-select" name="categoryId" required>
-            <option value="">Select a category</option>
-            <option value="1">CEREALS</option>
-            <option value="2">PULSES</option>
-            <option value="3">HORTICULTURE</option>
-            <option value="4">LIVESTOCK</option>
-          </select>
-        </div>
-        <div>
-          <label class="form-label">Unit</label>
-          <input type="text" class="form-input" name="unit" placeholder="e.g., 90 kg bag" required>
+          <label class="form-label">Region Name</label>
+          <input type="text" class="form-input" name="regionName" placeholder="e.g., Central Kenya, Coastal Kenya" required>
         </div>
         <div class="modal__footer">
           <button type="button" class="btn btn--ghost" id="modalCancel">Cancel</button>
-          <button type="submit" class="btn btn--primary">Add Product</button>
+          <button type="submit" class="btn btn--primary">Add Region</button>
         </div>
       </form>
     </div>
@@ -130,7 +115,7 @@
     const backdrop = document.getElementById('modalBackdrop');
     const closeBtn = document.getElementById('modalClose');
     const cancelBtn = document.getElementById('modalCancel');
-    const addBtn = document.getElementById('addProductBtn');
+    const addBtn = document.getElementById('addRegionBtn');
 
     const hideModal = () => backdrop.hidden = true;
 

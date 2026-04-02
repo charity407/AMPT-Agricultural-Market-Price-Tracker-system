@@ -1,89 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Log In — AgroMarket Price Tracker</title>
-  <link rel="stylesheet" href="css/style.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet"/>
-  <style>
-    .auth-layout {
-      display:flex; align-items:center; justify-content:center;
-      min-height:100dvh; padding:var(--sp-4); background-color:var(--c-surface-alt);
-    }
-    .auth-card {
-      background:var(--c-white); padding:var(--sp-8); border-radius:var(--radius-lg);
-      box-shadow:var(--shadow-lg); width:100%; max-width:26rem;
-      border-top:4px solid var(--c-field);
-    }
-    .auth-card__header { text-align:center; margin-bottom:var(--sp-6); }
-    .auth-card__logo   { font-size:var(--fs-3xl); color:var(--c-sprout); line-height:1; }
-    .auth-card__title  { font-family:var(--f-display); font-size:var(--fs-2xl); color:var(--c-field); margin-top:var(--sp-2); }
-    .form-group  { margin-bottom:var(--sp-4); }
-    .auth-footer { text-align:center; margin-top:var(--sp-6); font-size:var(--fs-sm); }
-    .error-banner {
-      background:#fef2f2; border:1px solid #fca5a5; color:#b91c1c;
-      padding:10px 14px; border-radius:6px; font-size:0.875rem;
-      margin-bottom:var(--sp-4);
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login — AgriPrice KE</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:wght@300;400;600&display=swap" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0f4f0;
+            font-family: 'Source Serif 4', serif;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.10);
+            padding: 2.5rem 2rem;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 1.75rem;
+        }
+
+        .brand h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #2e7d32;
+            letter-spacing: -0.5px;
+        }
+
+        .brand p {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.1rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.35rem;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 0.65rem 0.85rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2e7d32;
+            box-shadow: 0 0 0 2px rgba(46,125,50,0.12);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: #2e7d32;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            font-family: 'IBM Plex Mono', monospace;
+            letter-spacing: 0.5px;
+            transition: background 0.2s;
+        }
+
+        .btn:hover { background: #1b5e20; }
+
+        .error-msg {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+            border-radius: 5px;
+            padding: 0.65rem 0.85rem;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 1.25rem;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .register-link a {
+            color: #2e7d32;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .register-link a:hover { text-decoration: underline; }
+    </style>
 </head>
 <body>
-<main class="auth-layout">
-  <div class="auth-card">
+    <div class="card">
+        <div class="brand">
+            <h1>AgriPrice KE</h1>
+            <p>Agricultural Market Price Tracker</p>
+        </div>
 
-    <div class="auth-card__header">
-      <div class="auth-card__logo">⬡</div>
-      <h1 class="auth-card__title">Welcome Back</h1>
-      <p style="color:var(--c-text-muted);font-size:var(--fs-sm);">Access your market dashboard</p>
+        <!-- Error message shown when ?error= param is present -->
+        <script>
+            const params = new URLSearchParams(window.location.search);
+            const err = params.get('error');
+            const ok  = params.get('success');
+            if (err) {
+                document.write('<div class="error-msg">' + err + '</div>');
+            } else if (ok) {
+                document.write('<div style="background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;border-radius:5px;padding:.65rem .85rem;font-size:.9rem;margin-bottom:1rem;">' + ok + '</div>');
+            }
+        </script>
+
+        <form method="POST" action="login">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com" required autofocus />
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="••••••••" required />
+            </div>
+            <button type="submit" class="btn">Sign In</button>
+        </form>
+
+        <div class="register-link">
+            Don't have an account? <a href="register">Register here</a>
+        </div>
     </div>
-
-    <!-- Error message from LoginServlet -->
-    <%
-    String err = (String) request.getAttribute("error");
-    if (err != null) {
-    %>
-    <div class="error-banner"><%= err %></div>
-    <% } %>
-
-    <!-- Form submits to LoginServlet (POST /login) -->
-    <form method="POST" action="login" id="loginForm" novalidate>
-
-      <div class="form-group">
-        <label class="form-label" for="email">Email Address</label>
-        <input class="form-input" type="email" id="email" name="email"
-               required placeholder="name@example.com" autocomplete="email"/>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="password">Password</label>
-        <input class="form-input" type="password" id="password" name="password"
-               required placeholder="Enter your password" autocomplete="current-password"/>
-      </div>
-
-      <button class="btn btn--primary btn--full" type="submit" id="loginBtn">Log In</button>
-    </form>
-
-    <div class="auth-footer">
-      Don't have an account? <a href="register.html">Register here</a>.
-    </div>
-
-  </div>
-</main>
-
-<script>
-  document.getElementById('loginForm').addEventListener('submit', function(e) {
-    const email    = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    if (!email || !password) {
-      e.preventDefault();
-      alert('Please enter both email and password.');
-      return;
-    }
-    const btn = document.getElementById('loginBtn');
-    btn.textContent = 'Authenticating...';
-    btn.disabled = true;
-  });
-</script>
 </body>
 </html>

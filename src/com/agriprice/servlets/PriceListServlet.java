@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet("/prices/list")
+
 public class PriceListServlet extends HttpServlet {
 
     @Override
@@ -78,11 +78,12 @@ public class PriceListServlet extends HttpServlet {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 priceList.add(new String[] {
-                        rs.getString("product_name"),
-                        rs.getString("unit_price"),
-                        rs.getString("market_name"),
-                        rs.getString("region_name"),
-                        rs.getString("price_date")
+                        rs.getString("entry_id"),      // [0] used for edit link
+                        rs.getString("product_name"),  // [1]
+                        rs.getString("unit_price"),    // [2]
+                        rs.getString("market_name"),   // [3]
+                        rs.getString("region_name"),   // [4]
+                        rs.getString("price_date")     // [5]
                 });
             }
 
