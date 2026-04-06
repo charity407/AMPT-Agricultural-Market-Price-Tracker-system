@@ -44,7 +44,12 @@
 </head>
 <body>
 
-<jsp:include page="../navbar.jsp"/>
+        .hero {
+            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+            color: #dfe8e0; text-align: center; padding: 60px 24px;
+        }
+        .hero h1 { font-size: 2.4rem; margin-bottom: 10px; }
+        .hero p  { font-size: 1.05rem; opacity: 0.85; max-width: 520px; margin: 0 auto; }
 
 <div class="profile-wrap">
 

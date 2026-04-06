@@ -116,6 +116,43 @@
 </head>
 <body>
 
+    <style>
+        .navbar{
+        background:#2c3e50;
+        padding:12px;
+        }
+        
+        .navbar a{
+        color:white;
+        margin-right:15px;
+        text-decoration:none;
+        font-weight:bold;
+        }
+        
+        .navbar a:hover{
+        text-decoration:underline;
+        }
+        </style>
+        
+        <div class="navbar">
+        
+        <a href="../prices/list.jsp">Home</a>
+        
+        <a href="../prices/list.jsp">Prices</a>
+        
+        <a href="../prices/entry.jsp">Add Price</a>
+        
+        <a href="../prices/compare.jsp">Compare</a>
+        
+        <a href="../trends/trends.jsp">Trends</a>
+        
+        <a href="../alerts/alerts.jsp">Alerts</a>
+        
+        <a href="../profile/profile.jsp">Profile</a>
+        
+        </div>
+        
+
 <nav>
     <a href="../index.jsp" class="brand">🌾 AgriMarket Tracker</a>
     <ul>
