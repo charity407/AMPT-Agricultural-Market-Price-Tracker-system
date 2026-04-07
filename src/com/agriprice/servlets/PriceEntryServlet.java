@@ -77,6 +77,8 @@ public class PriceEntryServlet extends HttpServlet {
         // Get the logged-in user's ID from session
         int agentId = (int) session.getAttribute("userId");
 
+        String ensureAgent = "INSERT INTO market_agents (agent_id, verification_status) VALUES (?, 'PENDING') ON CONFLICT (agent_id) DO NOTHING";
+
         String sql = """
                 INSERT INTO price_entries
                     (product_id, market_id, agent_id, unit_price, price_date)
@@ -85,14 +87,19 @@ public class PriceEntryServlet extends HttpServlet {
                 DO UPDATE SET unit_price = EXCLUDED.unit_price
                 """;
 
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection()) {
+            try (PreparedStatement pa = conn.prepareStatement(ensureAgent)) {
+                pa.setInt(1, agentId);
+                pa.executeUpdate();
+            }
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, productId);
             ps.setInt(2, marketId);
             ps.setInt(3, agentId);
             ps.setDouble(4, price);
             ps.setDate(5, Date.valueOf(date));
             ps.executeUpdate();
+            }
             resp.sendRedirect(req.getContextPath() + "/prices/list?success=1");
         } catch (Exception e) {
             e.printStackTrace();
