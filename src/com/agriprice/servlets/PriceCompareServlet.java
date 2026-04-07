@@ -32,8 +32,32 @@ public class PriceCompareServlet extends HttpServlet {
         String productIdParam = req.getParameter("productId");
         String marketIdsParam = req.getParameter("marketIds"); // comma-separated
 
-        if (productIdParam == null || marketIdsParam == null) {
-            resp.sendRedirect(req.getContextPath() + "/prices/list?error=Missing parameters for comparison");
+        // Load products and markets for the selection form (always needed)
+        List<String[]> products = new ArrayList<>();
+        List<String[]> markets  = new ArrayList<>();
+        try (Connection conn = DBConnection.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "SELECT product_id, product_name FROM products WHERE is_active = true ORDER BY product_name");
+                 ResultSet rs = ps.executeQuery()) {
+                while (rs.next())
+                    products.add(new String[]{ rs.getString("product_id"), rs.getString("product_name") });
+            }
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "SELECT market_id, market_name FROM markets WHERE status = 'ACTIVE' ORDER BY market_name");
+                 ResultSet rs = ps.executeQuery()) {
+                while (rs.next())
+                    markets.add(new String[]{ rs.getString("market_id"), rs.getString("market_name") });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        req.setAttribute("products", products);
+        req.setAttribute("markets",  markets);
+
+        // If no params yet, just show the selection form
+        if (productIdParam == null || productIdParam.isEmpty()
+                || marketIdsParam == null || marketIdsParam.isEmpty()) {
+            req.getRequestDispatcher("/jsp/prices/compare.jsp").forward(req, resp);
             return;
         }
 
@@ -41,7 +65,7 @@ public class PriceCompareServlet extends HttpServlet {
         String[] marketIdStrings = marketIdsParam.split(",");
         List<Integer> marketIds = new ArrayList<>();
         for (String id : marketIdStrings) {
-            marketIds.add(Integer.parseInt(id.trim()));
+            if (!id.trim().isEmpty()) marketIds.add(Integer.parseInt(id.trim()));
         }
 
         // Query latest prices for the product in each market
