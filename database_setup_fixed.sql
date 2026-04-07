@@ -796,6 +796,15 @@ ALTER TABLE ONLY public.reports
 
 
 --
+-- Name: uq_price_entry; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Required for ON CONFLICT (product_id, market_id, price_date) UPSERT in PriceEntryServlet
+--
+
+ALTER TABLE ONLY public.price_entries
+    ADD CONSTRAINT uq_price_entry UNIQUE (product_id, market_id, price_date);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
